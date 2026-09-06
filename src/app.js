@@ -43,6 +43,8 @@ const state = {
   turnWins: 0,
   rollingDice: new Set(),
   rollingDisplay: new Map(),
+  rollingTumble: new Map(),
+  starterTumble: null,
   message: null,
   interaction: null,
   moveSelection: null,
@@ -73,6 +75,8 @@ function resetTurn() {
   }));
   state.rollingDice = new Set();
   state.rollingDisplay = new Map();
+  state.rollingTumble = new Map();
+  state.starterTumble = null;
   state.message = null;
 }
 
@@ -123,6 +127,21 @@ function randomFace() {
   return FACES[Math.floor(Math.random() * FACES.length)];
 }
 
+// Variantes de giro: '' usa el giro base (cube-tumble-3d-v13). Todas las
+// variantes terminan en la identidad para que el reposo muestre una sola cara.
+const DICE_TUMBLE_VARIANTS = ['', 'tumble-b', 'tumble-c', 'tumble-d', 'tumble-e', 'tumble-f'];
+
+function randomTumbleVariant() {
+  return DICE_TUMBLE_VARIANTS[Math.floor(Math.random() * DICE_TUMBLE_VARIANTS.length)];
+}
+
+// Asigna variantes distintas a los dados de un lanzamiento para que cada uno
+// gire de forma visiblemente diferente.
+function distinctTumbleVariants(count) {
+  const pool = shuffle([...DICE_TUMBLE_VARIANTS]);
+  return pool.slice(0, count);
+}
+
 function buildPlayers() {
   return Array.from({ length: state.setupCount }, (_, i) => ({
     id: `player-${i + 1}`,
@@ -163,11 +182,13 @@ async function rollStarterDie() {
   if (state.starterRolling) return;
   state.starterRolling = true;
   state.starterLastRoll = null;
+  state.starterTumble = randomTumbleVariant();
   render();
   await wait(STARTER_DIE_ROLL_DURATION_MS);
   const face = randomFace();
   state.starterLastRoll = face;
   state.starterRolling = false;
+  state.starterTumble = null;
   if (face === '1') {
     state.currentPlayerIndex = state.starterIndex;
     setMessage(`${state.players[state.starterIndex].name} ha sacado 1 y comienza la partida.`, 'success');
@@ -213,9 +234,11 @@ async function animateDiceRoll(ids) {
 
   // Elegimos el resultado antes de iniciar la animación. Durante el giro el cubo muestra
   // físicamente sus seis caras; al finalizar queda orientado hacia el resultado elegido.
-  validIds.forEach((id) => {
+  const variants = distinctTumbleVariants(validIds.length);
+  validIds.forEach((id, index) => {
     state.rollingDice.add(id);
     state.rollingDisplay.set(id, randomFace());
+    state.rollingTumble.set(id, variants[index] || '');
   });
   render();
   await wait(DICE_ROLL_DURATION_MS);
@@ -225,6 +248,7 @@ async function animateDiceRoll(ids) {
     die.face = state.rollingDisplay.get(id) || randomFace();
     state.rollingDice.delete(id);
     state.rollingDisplay.delete(id);
+    state.rollingTumble.delete(id);
   });
   render();
 }
@@ -771,10 +795,11 @@ const DICE_SIDE_CLASS = {
   y2: 'show-bottom',
 };
 
-function renderDiceCube(face, { rolling = false, mini = false, hidden = false } = {}) {
+function renderDiceCube(face, { rolling = false, mini = false, hidden = false, tumble = '' } = {}) {
   const sideClass = DICE_SIDE_CLASS[face] || 'show-front';
+  const tiltClass = `dice-tilt ${rolling ? 'is-rolling' : ''}${rolling && tumble ? ` ${tumble}` : ''}`.trim();
   return `<span class="dice-scene ${mini ? 'mini' : ''}" aria-hidden="true" data-visible-face="${escapeHtml(face || '1')}">
-    <span class="dice-tilt ${rolling ? 'is-rolling' : ''}">
+    <span class="${tiltClass}">
       <span class="dice-cube ${sideClass} ${hidden ? 'is-hidden-face' : ''}">
         <span class="cube-face cube-front"><span class="face-val">${hidden ? '?' : renderFaceSymbol('1')}</span></span>
         <span class="cube-face cube-back"><span class="face-val">${hidden ? '?' : renderFaceSymbol('2')}</span></span>
@@ -844,7 +869,7 @@ function renderStarter() {
         <h1>¿Quién empieza?</h1>
         <p>Empieza el primer jugador que saque <strong>1</strong>.</p>
         <div class="starter-player">Turno de <strong>${escapeHtml(player.name)}</strong></div>
-        <div class="starter-die-3d ${state.starterRolling ? 'rolling' : ''}">${renderDiceCube(state.starterLastRoll || '1', { rolling: state.starterRolling, hidden: !state.starterLastRoll && !state.starterRolling })}</div>
+        <div class="starter-die-3d ${state.starterRolling ? 'rolling' : ''}">${renderDiceCube(state.starterLastRoll || '1', { rolling: state.starterRolling, hidden: !state.starterLastRoll && !state.starterRolling, tumble: state.starterRolling ? state.starterTumble || '' : '' })}</div>
         ${state.starterLastRoll && state.starterLastRoll !== '1' ? `<p class="starter-result">Ha salido ${renderFaceSymbol(state.starterLastRoll)}. Continúa el siguiente jugador.</p>` : ''}
         <button class="primary giant" data-action="starter-roll" ${state.starterRolling ? 'disabled' : ''}>${state.starterRolling ? 'Girando…' : 'Tirar para empezar'}</button>
       </section>
@@ -889,34 +914,39 @@ function renderDie(die, context = 'pool') {
     <button class="die die-3d ${rolling ? 'rolling' : ''} ${die.locked ? 'locked' : ''} ${selectedByHelp ? 'target-selected' : ''} ${selectedMove ? 'move-selected' : ''}"
       data-die-id="${die.id}" draggable="${!die.locked && state.hasRolled && !rolling}"
       aria-label="Dado ${die.id.replace('die-','')} con ${FACE_LABELS[displayFace]}${die.locked ? ', bloqueado' : ''}">
-      ${renderDiceCube(displayFace, { rolling, hidden })}
+      ${renderDiceCube(displayFace, { rolling, hidden, tumble: state.rollingTumble.get(die.id) })}
       ${die.locked ? '<span class="lock-badge" aria-hidden="true">🔒</span>' : ''}
     </button>`;
 }
 
-function renderDicePool() {
+function diceSelectionMode() {
+  return !!(state.interaction && ['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','CHOOSE_DICE_FACES'].includes(state.interaction.card.effect));
+}
+
+function renderDiceBody() {
   const inTerms = new Set(state.terms.flatMap((t) => t.factors.filter((f) => f.kind === 'die').map((f) => f.dieId)));
-  const interactionSelectsDice = state.interaction && ['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','CHOOSE_DICE_FACES'].includes(state.interaction.card.effect);
   return `
-    <section class="dice-section ${interactionSelectsDice ? 'selection-mode' : ''}">
-      <div class="section-title-row"><h2>Dados</h2><span>${state.hasRolled ? 'Arrastra o pulsa un dado y luego una caja' : 'Lanza para comenzar'}</span></div>
-      <div class="dice-pool" data-drop-pool="true">
-        <div class="dice-pool-grid">
-          ${state.dice.map((die) => {
-            const isInTerm = inTerms.has(die.id);
-            return `<div class="dice-slot ${isInTerm ? 'occupied-in-term' : ''}" data-dice-slot="${die.id}">
-              ${isInTerm
-                ? `<span class="dice-slot-placeholder"><strong>Dado ${die.id.replace('die-','')}</strong><small>En la expresión</small></span>`
-                : `${renderDie(die)}<span class="die-number" aria-hidden="true">${die.id.replace('die-','')}</span>`}
-            </div>`;
-          }).join('')}
-        </div>
+    <div class="section-title-row"><h2>Dados</h2><span>${state.hasRolled ? 'Arrastra o pulsa un dado y luego una caja' : 'Lanza para comenzar'}</span></div>
+    <div class="dice-pool" data-drop-pool="true">
+      <div class="dice-pool-grid">
+        ${state.dice.map((die) => {
+          const isInTerm = inTerms.has(die.id);
+          return `<div class="dice-slot ${isInTerm ? 'occupied-in-term' : ''}" data-dice-slot="${die.id}">
+            ${isInTerm
+              ? `<span class="dice-slot-placeholder"><strong>Dado ${die.id.replace('die-','')}</strong><small>En la expresión</small></span>`
+              : `${renderDie(die)}<span class="die-number" aria-hidden="true">${die.id.replace('die-','')}</span>`}
+          </div>`;
+        }).join('')}
       </div>
-      <div class="dice-actions">
-        <button class="primary roll-button" data-action="launch-dice" ${state.hasRolled || state.rollingDice.size ? 'disabled' : ''}>🎲 ${state.hasRolled ? 'Dados lanzados' : 'Lanzar dados'}</button>
-        ${state.dice.some((d) => d.locked) ? `<span class="locked-note">🔒 ${state.dice.filter((d) => d.locked).length} dado(s) usado(s) en el primer reto</span>` : ''}
-      </div>
-    </section>`;
+    </div>
+    <div class="dice-actions">
+      <button class="primary roll-button" data-action="launch-dice" ${state.hasRolled || state.rollingDice.size ? 'disabled' : ''}>🎲 ${state.hasRolled ? 'Dados lanzados' : 'Lanzar dados'}</button>
+      ${state.dice.some((d) => d.locked) ? `<span class="locked-note">🔒 ${state.dice.filter((d) => d.locked).length} dado(s) usado(s) en el primer reto</span>` : ''}
+    </div>`;
+}
+
+function renderDicePool() {
+  return `<section class="dice-section ${diceSelectionMode() ? 'selection-mode' : ''}">${renderDiceBody()}</section>`;
 }
 
 function renderFactor(factor, termIndex, factorIndex) {
@@ -932,7 +962,7 @@ function renderFactor(factor, termIndex, factorIndex) {
     return `<button class="term-die term-die-3d ${rolling ? 'rolling' : ''} ${selectedFactor ? 'target-selected' : ''} ${canChange ? 'target-available' : ''} ${moveSelected ? 'move-selected' : ''}"
       data-factor-id="${factor.id}" data-term-index="${termIndex}" data-factor-index="${factorIndex}" data-die-id="${factor.dieId}"
       draggable="${!die?.locked && !rolling}" aria-label="Factor ${FACE_LABELS[displayFace]}">
-      ${renderDiceCube(displayFace, { rolling, mini:true })}${factor.overrideFace ? '<small>AYUDA</small>' : ''}
+      ${renderDiceCube(displayFace, { rolling, mini:true, tumble: state.rollingTumble.get(factor.dieId) })}${factor.overrideFace ? '<small>AYUDA</small>' : ''}
     </button>`;
   }
   return `<button class="virtual-factor ${selectedFactor ? 'target-selected' : ''} ${canChange ? 'target-available' : ''} ${moveSelected ? 'move-selected' : ''}"
@@ -969,44 +999,48 @@ function renderTermBox(term, index) {
     </div>`;
 }
 
-function renderBuilder() {
+function renderBuilderBody() {
   const poly = expressionPoly();
   const rawTerms = state.terms.map((t) => simplifyTerm(t, diceById())).filter(Boolean).map(renderMonomial);
   if (state.globalConstantDelta) rawTerms.push(String(state.globalConstantDelta));
   return `
-    <section class="builder-section">
-      <div class="section-title-row"><h2>Construye la expresión</h2><span>Dentro de cada caja se multiplica; entre cajas se suma.</span></div>
-      <div class="term-grid">${state.terms.map(renderTermBox).join('<div class="plus-sign">+</div>')}</div>
-      <div class="expression-summary">
-        <div><span>Expresión por cajas</span><strong>${rawTerms.length ? escapeHtml(rawTerms.join(' + ')) : '—'}</strong></div>
-        <div class="simplified"><span>Expresión simplificada</span><strong>${nonEmptyExpression() ? escapeHtml(renderPolynomial(poly)) : '—'}</strong></div>
-        ${state.globalConstantDelta ? `<span class="global-modifier">Ayuda global: +${state.globalConstantDelta}</span>` : ''}
-      </div>
-    </section>`;
+    <div class="section-title-row"><h2>Construye la expresión</h2><span>Dentro de cada caja se multiplica; entre cajas se suma.</span></div>
+    <div class="term-grid">${state.terms.map(renderTermBox).join('<div class="plus-sign">+</div>')}</div>
+    <div class="expression-summary">
+      <div><span>Expresión por cajas</span><strong>${rawTerms.length ? escapeHtml(rawTerms.join(' + ')) : '—'}</strong></div>
+      <div class="simplified"><span>Expresión simplificada</span><strong>${nonEmptyExpression() ? escapeHtml(renderPolynomial(poly)) : '—'}</strong></div>
+      ${state.globalConstantDelta ? `<span class="global-modifier">Ayuda global: +${state.globalConstantDelta}</span>` : ''}
+    </div>`;
+}
+
+function renderBuilder() {
+  return `<section class="builder-section">${renderBuilderBody()}</section>`;
+}
+
+function renderHelpHandBody() {
+  const hand = currentPlayer().hand;
+  return `
+    <div class="section-title-row">
+      <div><h2>Cartas de ayuda</h2><span class="section-kicker">Tu mano · pulsa una carta para jugarla</span></div>
+      <div class="deck-counter"><span class="mini-deck help-deck-back"></span><strong>${state.helpDeck.length}</strong><small>mazo</small><span class="discard-count">${state.helpDiscard.length} descarte</span></div>
+    </div>
+    <div class="help-hand">
+      ${hand.length ? hand.map((card, index) => {
+        const applicable = helpApplicable(card);
+        const selected = state.interaction?.card.instanceId === card.instanceId;
+        const meta = helpCategoryMeta(card.category);
+        return `<button class="help-card visual-card ${selected ? 'selected' : ''} ${!applicable ? 'disabled-card' : ''}" data-help-id="${card.instanceId}" ${(!applicable || (state.interaction && !selected)) ? 'disabled' : ''} style="--card-index:${index}">
+          <span class="help-card-header"><b>${meta.icon}</b><span>${meta.label}</span><em>${card.id}</em></span>
+          <span class="help-card-art"><span class="help-art-symbol">${meta.icon}</span><span class="help-art-ring"></span></span>
+          <span class="help-card-text">${escapeHtml(card.text)}</span>
+          <span class="help-card-footer"><strong>ALGEROLL</strong><small>${applicable ? 'USAR CARTA' : 'NO APLICABLE'}</small></span>
+        </button>`;
+      }).join('') : '<div class="empty-note">No tienes cartas de ayuda.</div>'}
+    </div>`;
 }
 
 function renderHelpHand() {
-  const hand = currentPlayer().hand;
-  return `
-    <section class="help-section">
-      <div class="section-title-row">
-        <div><h2>Cartas de ayuda</h2><span class="section-kicker">Tu mano · pulsa una carta para jugarla</span></div>
-        <div class="deck-counter"><span class="mini-deck help-deck-back"></span><strong>${state.helpDeck.length}</strong><small>mazo</small><span class="discard-count">${state.helpDiscard.length} descarte</span></div>
-      </div>
-      <div class="help-hand">
-        ${hand.length ? hand.map((card, index) => {
-          const applicable = helpApplicable(card);
-          const selected = state.interaction?.card.instanceId === card.instanceId;
-          const meta = helpCategoryMeta(card.category);
-          return `<button class="help-card visual-card ${selected ? 'selected' : ''} ${!applicable ? 'disabled-card' : ''}" data-help-id="${card.instanceId}" ${(!applicable || (state.interaction && !selected)) ? 'disabled' : ''} style="--card-index:${index}">
-            <span class="help-card-header"><b>${meta.icon}</b><span>${meta.label}</span><em>${card.id}</em></span>
-            <span class="help-card-art"><span class="help-art-symbol">${meta.icon}</span><span class="help-art-ring"></span></span>
-            <span class="help-card-text">${escapeHtml(card.text)}</span>
-            <span class="help-card-footer"><strong>ALGEROLL</strong><small>${applicable ? 'USAR CARTA' : 'NO APLICABLE'}</small></span>
-          </button>`;
-        }).join('') : '<div class="empty-note">No tienes cartas de ayuda.</div>'}
-      </div>
-    </section>`;
+  return `<section class="help-section">${renderHelpHandBody()}</section>`;
 }
 
 function helpInstruction(interaction) {
@@ -1059,7 +1093,7 @@ function renderHelpPanel() {
   const interaction = state.interaction;
   if (!interaction) return '';
   return `
-    <section class="help-active-panel" role="region" aria-label="Usar carta de ayuda">
+    <section class="help-active-panel" data-zone="help-active" role="region" aria-label="Usar carta de ayuda">
       <div class="help-active-copy">
         <span class="eyebrow">Carta ${interaction.card.id} · Modo selección</span>
         <h2>${escapeHtml(interaction.card.text)}</h2>
@@ -1073,40 +1107,138 @@ function renderHelpPanel() {
     </section>`;
 }
 
+const GAME_ZONES = ['scoreboard', 'turn', 'challenge-title', 'challenges', 'dice', 'builder', 'help', 'status', 'actions'];
+let zoneSnapshot = new Map();
+let helpPanelSnapshot = '';
+
+function gameHasZones() {
+  try {
+    return typeof app?.querySelector === 'function' && !!app.querySelector('[data-zone="scoreboard"]');
+  } catch {
+    return false;
+  }
+}
+
+function zoneNode(name) {
+  try {
+    return app?.querySelector ? app.querySelector(`[data-zone="${name}"]`) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setZoneHtml(name, html) {
+  const el = zoneNode(name);
+  if (!el) return false;
+  if (zoneSnapshot.get(name) === html) return false;
+  el.innerHTML = html;
+  zoneSnapshot.set(name, html);
+  return true;
+}
+
+function primeGameZones(htmls) {
+  zoneSnapshot = new Map(htmls);
+  helpPanelSnapshot = '';
+}
+
+function syncDiceSectionMode() {
+  const el = zoneNode('dice');
+  if (!el) return;
+  const want = `dice-section${diceSelectionMode() ? ' selection-mode' : ''}`;
+  if (el.className !== want) el.className = want;
+}
+
+function syncHelpActivePanel() {
+  const html = renderHelpPanel();
+  const current = zoneNode('help-active');
+  if (helpPanelSnapshot === html && (!!html) === !!current) return;
+  helpPanelSnapshot = html;
+  const parent = zoneNode('dice')?.parentNode;
+  if (current) current.remove();
+  if (!html || !parent) return;
+  const tpl = document.createElement('template');
+  tpl.innerHTML = html;
+  parent.insertBefore(tpl.content.firstElementChild, zoneNode('dice'));
+}
+
+function turnInfoHtml(player) {
+  return `<span>Turno actual</span><strong>${escapeHtml(player.name)}</strong><small>${state.turnWins}/2 retos logrados</small>`;
+}
+
+function challengeTitleHtml() {
+  return `<h2>Retos visibles</h2><span>Mazo: ${state.challengeDeck.length} · Selecciona uno para comprobar</span>`;
+}
+
+function statusAreaHtml(needsAnswer, selectedChallenge) {
+  return `
+    ${state.message ? `<div class="message ${state.message.type}" role="status">${escapeHtml(state.message.text)}</div>` : '<div class="message neutral">Construye una expresión y selecciona un reto.</div>'}
+    ${needsAnswer ? `<label class="answer-field">Tu resultado para x = ${selectedChallenge.validator.x}, y = ${selectedChallenge.validator.y}<input type="number" step="1" data-evaluation-answer value="${escapeHtml(state.evaluationAnswer)}" placeholder="Resultado"></label>` : ''}`;
+}
+
+function mainActionsHtml() {
+  return `
+    <button class="success-button" data-action="check-challenge" ${!state.hasRolled ? 'disabled' : ''}>✓ Comprobar reto</button>
+    <button class="pass-button" data-action="pass-turn" ${!state.hasRolled ? 'disabled' : ''}>⏭ Pasar turno</button>`;
+}
+
+function currentZoneHtmls(player, selectedChallenge, needsAnswer) {
+  return new Map([
+    ['scoreboard', renderScoreboard()],
+    ['turn', turnInfoHtml(player)],
+    ['challenge-title', challengeTitleHtml()],
+    ['challenges', renderChallenges()],
+    ['dice', renderDiceBody()],
+    ['builder', renderBuilderBody()],
+    ['help', renderHelpHandBody()],
+    ['status', statusAreaHtml(needsAnswer, selectedChallenge)],
+    ['actions', mainActionsHtml()],
+  ]);
+}
+
+function renderGameFull() {
+  const player = currentPlayer();
+  const selectedChallenge = findChallenge(state.selectedChallengeId);
+  const needsAnswer = selectedChallenge?.validator.type === 'EVALUATE_AND_ANSWER';
+  return `
+    <main class="game-screen">
+      <header class="game-header">
+        <div class="logo compact"><span>ALGE</span><strong>ROLL</strong></div>
+        <div class="scoreboard" data-zone="scoreboard">${renderScoreboard()}</div>
+        <div class="turn-info" data-zone="turn">${turnInfoHtml(player)}</div>
+      </header>
+
+      <section class="challenge-section">
+        <div class="section-title-row" data-zone="challenge-title">${challengeTitleHtml()}</div>
+        <div class="challenge-grid" data-zone="challenges">${renderChallenges()}</div>
+      </section>
+
+      ${renderHelpPanel()}
+      <section class="dice-section ${diceSelectionMode() ? 'selection-mode' : ''}" data-zone="dice">${renderDiceBody()}</section>
+      <section class="builder-section" data-zone="builder">${renderBuilderBody()}</section>
+      <section class="help-section" data-zone="help">${renderHelpHandBody()}</section>
+
+      <section class="action-bar">
+        <div class="status-area" data-zone="status">${statusAreaHtml(needsAnswer, selectedChallenge)}</div>
+        <div class="main-actions" data-zone="actions">${mainActionsHtml()}</div>
+      </section>
+    </main>`;
+}
+
 function renderGame() {
   const player = currentPlayer();
   const selectedChallenge = findChallenge(state.selectedChallengeId);
   const needsAnswer = selectedChallenge?.validator.type === 'EVALUATE_AND_ANSWER';
-  app.innerHTML = `
-    <main class="game-screen">
-      <header class="game-header">
-        <div class="logo compact"><span>ALGE</span><strong>ROLL</strong></div>
-        <div class="scoreboard">${renderScoreboard()}</div>
-        <div class="turn-info"><span>Turno actual</span><strong>${escapeHtml(player.name)}</strong><small>${state.turnWins}/2 retos logrados</small></div>
-      </header>
 
-      <section class="challenge-section">
-        <div class="section-title-row"><h2>Retos visibles</h2><span>Mazo: ${state.challengeDeck.length} · Selecciona uno para comprobar</span></div>
-        <div class="challenge-grid">${renderChallenges()}</div>
-      </section>
+  if (!gameHasZones()) {
+    app.innerHTML = renderGameFull();
+    primeGameZones(currentZoneHtmls(player, selectedChallenge, needsAnswer));
+    return;
+  }
 
-      ${renderHelpPanel()}
-      ${renderDicePool()}
-      ${renderBuilder()}
-      ${renderHelpHand()}
-
-      <section class="action-bar">
-        <div class="status-area">
-          ${state.message ? `<div class="message ${state.message.type}" role="status">${escapeHtml(state.message.text)}</div>` : '<div class="message neutral">Construye una expresión y selecciona un reto.</div>'}
-          ${needsAnswer ? `<label class="answer-field">Tu resultado para x = ${selectedChallenge.validator.x}, y = ${selectedChallenge.validator.y}<input type="number" step="1" data-evaluation-answer value="${escapeHtml(state.evaluationAnswer)}" placeholder="Resultado"></label>` : ''}
-        </div>
-        <div class="main-actions">
-          <button class="success-button" data-action="check-challenge" ${!state.hasRolled ? 'disabled' : ''}>✓ Comprobar reto</button>
-          <button class="pass-button" data-action="pass-turn" ${!state.hasRolled ? 'disabled' : ''}>⏭ Pasar turno</button>
-        </div>
-      </section>
-
-    </main>`;
+  const htmls = currentZoneHtmls(player, selectedChallenge, needsAnswer);
+  for (const [name, html] of htmls) setZoneHtml(name, html);
+  syncHelpActivePanel();
+  syncDiceSectionMode();
 }
 
 function renderFinal() {

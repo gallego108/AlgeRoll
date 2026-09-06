@@ -1139,3 +1139,78 @@ body::before {
   animation: cube-tumble-3d-v13 3.55s cubic-bezier(.16,.48,.18,1) both;
   transition: none;
 }
+
+/* Cada dado elige al azar una de estas variantes de giro (v1.3.1). Todas
+   terminan en la identidad (translate3d(0,0,0) rotateX(0) rotateY(0)
+   rotateZ(0) scale(1)), por lo que el reposo final es el actual: la cara
+   obtenida, alineada y de frente. */
+.dice-tilt.is-rolling.tumble-b { animation-name: cube-tumble-3d-v13-b; }
+.dice-tilt.is-rolling.tumble-c { animation-name: cube-tumble-3d-v13-c; }
+.dice-tilt.is-rolling.tumble-d { animation-name: cube-tumble-3d-v13-d; }
+.dice-tilt.is-rolling.tumble-e { animation-name: cube-tumble-3d-v13-e; }
+.dice-tilt.is-rolling.tumble-f { animation-name: cube-tumble-3d-v13-f; }
+
+/* b · Giro tipo moneda: rotación dominante sobre el eje vertical (Y). */
+@keyframes cube-tumble-3d-v13-b {
+  0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+  10%  { transform: translate3d(0,-44px,12px) rotateX(0deg) rotateY(320deg) rotateZ(10deg) scale(1.04); }
+  25%  { transform: translate3d(0,-12px,2px) rotateX(90deg) rotateY(740deg) rotateZ(-8deg) scale(.99); }
+  40%  { transform: translate3d(0,-40px,16px) rotateX(180deg) rotateY(1240deg) rotateZ(16deg) scale(1.06); }
+  55%  { transform: translate3d(0,-6px,0px) rotateX(270deg) rotateY(1720deg) rotateZ(0deg) scale(1); }
+  70%  { transform: translate3d(0,-32px,10px) rotateX(360deg) rotateY(2300deg) rotateZ(10deg) scale(1.04); }
+  85%  { transform: translate3d(0,-10px,4px) rotateX(405deg) rotateY(2820deg) rotateZ(-6deg) scale(.99); }
+  96%  { transform: translate3d(0,-18px,6px) rotateX(450deg) rotateY(3200deg) rotateZ(4deg) scale(1.01); }
+  100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+}
+
+/* c · Voltereta frontal: rotación dominante sobre el eje horizontal (X). */
+@keyframes cube-tumble-3d-v13-c {
+  0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+  10%  { transform: translate3d(0,-42px,20px) rotateX(180deg) rotateY(40deg) rotateZ(60deg) scale(1.06); }
+  24%  { transform: translate3d(0,-18px,6px) rotateX(340deg) rotateY(90deg) rotateZ(30deg) scale(1); }
+  38%  { transform: translate3d(0,-40px,22px) rotateX(540deg) rotateY(160deg) rotateZ(160deg) scale(1.06); }
+  52%  { transform: translate3d(0,-10px,2px) rotateX(700deg) rotateY(220deg) rotateZ(220deg) scale(.99); }
+  66%  { transform: translate3d(0,-36px,14px) rotateX(860deg) rotateY(290deg) rotateZ(80deg) scale(1.05); }
+  80%  { transform: translate3d(0,-8px,2px) rotateX(960deg) rotateY(330deg) rotateZ(280deg) scale(1); }
+  92%  { transform: translate3d(0,-20px,6px) rotateX(1040deg) rotateY(360deg) rotateZ(350deg) scale(1.01); }
+  100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+}
+
+/* d · Balanceo lateral con arranque en sentido contrario. */
+@keyframes cube-tumble-3d-v13-d {
+  0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+  9%   { transform: translate3d(6px,-46px,8px) rotateX(-160deg) rotateY(60deg) rotateZ(120deg) scale(1.05); }
+  22%  { transform: translate3d(-6px,-14px,2px) rotateX(-240deg) rotateY(140deg) rotateZ(300deg) scale(1); }
+  36%  { transform: translate3d(5px,-40px,18px) rotateX(-140deg) rotateY(240deg) rotateZ(60deg) scale(1.05); }
+  50%  { transform: translate3d(-4px,-8px,0px) rotateX(-60deg) rotateY(320deg) rotateZ(240deg) scale(.99); }
+  64%  { transform: translate3d(6px,-34px,12px) rotateX(60deg) rotateY(420deg) rotateZ(120deg) scale(1.05); }
+  78%  { transform: translate3d(-3px,-6px,2px) rotateX(200deg) rotateY(500deg) rotateZ(360deg) scale(1); }
+  90%  { transform: translate3d(0,-22px,6px) rotateX(340deg) rotateY(600deg) rotateZ(180deg) scale(1.01); }
+  100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+}
+
+/* e · Trompo: rotación en Z muy marcada que después va tumbándose. */
+@keyframes cube-tumble-3d-v13-e {
+  0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+  12%  { transform: translate3d(0,-42px,6px) rotateX(60deg) rotateY(30deg) rotateZ(300deg) scale(1.05); }
+  26%  { transform: translate3d(0,-10px,2px) rotateX(180deg) rotateY(90deg) rotateZ(600deg) scale(1); }
+  40%  { transform: translate3d(0,-44px,12px) rotateX(300deg) rotateY(160deg) rotateZ(900deg) scale(1.06); }
+  54%  { transform: translate3d(0,-6px,0px) rotateX(420deg) rotateY(240deg) rotateZ(1200deg) scale(.99); }
+  68%  { transform: translate3d(0,-32px,10px) rotateX(540deg) rotateY(330deg) rotateZ(1500deg) scale(1.05); }
+  82%  { transform: translate3d(0,-12px,4px) rotateX(660deg) rotateY(390deg) rotateZ(1800deg) scale(1); }
+  93%  { transform: translate3d(0,-18px,4px) rotateX(760deg) rotateY(430deg) rotateZ(2100deg) scale(1.01); }
+  100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+}
+
+/* f · Rebotes laterales alternos con giros rápidos iniciales. */
+@keyframes cube-tumble-3d-v13-f {
+  0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+  8%   { transform: translate3d(7px,-42px,16px) rotateX(120deg) rotateY(200deg) rotateZ(45deg) scale(1.06); }
+  20%  { transform: translate3d(-7px,-12px,4px) rotateX(260deg) rotateY(420deg) rotateZ(120deg) scale(1); }
+  34%  { transform: translate3d(6px,-38px,14px) rotateX(440deg) rotateY(640deg) rotateZ(200deg) scale(1.05); }
+  48%  { transform: translate3d(-5px,-8px,0px) rotateX(620deg) rotateY(860deg) rotateZ(280deg) scale(.99); }
+  62%  { transform: translate3d(7px,-30px,10px) rotateX(800deg) rotateY(1060deg) rotateZ(40deg) scale(1.05); }
+  76%  { transform: translate3d(-4px,-6px,2px) rotateX(940deg) rotateY(1240deg) rotateZ(160deg) scale(1); }
+  90%  { transform: translate3d(0,-18px,6px) rotateX(1040deg) rotateY(1400deg) rotateZ(320deg) scale(1.01); }
+  100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+}
