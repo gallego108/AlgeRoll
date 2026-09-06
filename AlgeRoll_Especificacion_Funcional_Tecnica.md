@@ -406,6 +406,8 @@ Las cartas restantes forman el mazo de ayuda boca abajo.
 - si termina una ronda completa sin que aparezca `1`, se repite;
 - en modo de un jugador esta fase se omite.
 
+**[ACORDADO v1.3.1]** El resultado de la tirada inicial se muestra **en la propia cara del cubo** al terminar el giro; **no** se muestra un texto redundante con el valor (p. ej. “Ha salido …”). El giro aterriza ya orientado a la cara obtenida, sin re-render que vuelva a mostrar el valor.
+
 Esta tirada inicial no afecta los cinco dados de la partida ni consume cartas.
 
 ---
@@ -917,7 +919,7 @@ Solo multijugador:
 
 - mostrar jugador al que corresponde tirar;
 - botón `Tirar para empezar`;
-- mostrar resultado;
+- el dado gira y queda orientado a la cara obtenida; el resultado se lee en la propia cara del cubo (sin texto redundante);
 - cuando aparezca `1`, anunciar primer jugador y habilitar `Ir a la mesa`.
 
 ## 15.4 Pantalla C - Mesa principal

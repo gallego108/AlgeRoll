@@ -859,17 +859,12 @@ function renderSetup() {
     </main>`;
 }
 
-function starterResultHtml() {
-  return `<p class="starter-result">Ha salido ${renderFaceSymbol(state.starterLastRoll)}. Continúa el siguiente jugador.</p>`;
-}
-
 function starterButtonLabel() {
   return state.starterRolling ? 'Girando…' : 'Tirar para empezar';
 }
 
 function renderStarterFull() {
   const player = state.players[state.starterIndex];
-  const hasResult = !!(state.starterLastRoll && !state.starterRolling && state.starterLastRoll !== '1');
   return `
     <main class="starter-screen">
       <section class="starter-card">
@@ -878,7 +873,6 @@ function renderStarterFull() {
         <p>Empieza el primer jugador que saque <strong>1</strong>.</p>
         <div class="starter-player">Turno de <strong>${escapeHtml(player.name)}</strong></div>
         <div class="starter-die-3d ${state.starterRolling ? 'rolling' : ''}">${renderDiceCube(state.starterLastRoll || '1', { rolling: state.starterRolling, hidden: !state.starterLastRoll && !state.starterRolling, tumble: state.starterRolling ? state.starterTumble || '' : '' })}</div>
-        ${hasResult ? starterResultHtml() : ''}
         <button class="primary giant" data-action="starter-roll" ${state.starterRolling ? 'disabled' : ''}>${starterButtonLabel()}</button>
       </section>
     </main>`;
@@ -920,15 +914,6 @@ function renderStarter() {
   if (btn) {
     btn.disabled = state.starterRolling;
     btn.textContent = starterButtonLabel();
-  }
-
-  const hasResult = !!(state.starterLastRoll && !state.starterRolling && state.starterLastRoll !== '1');
-  const existingMsg = card.querySelector('.starter-result');
-  if (hasResult && !existingMsg) {
-    const ref = card.querySelector('[data-action="starter-roll"]') || dieWrap;
-    ref.insertAdjacentHTML('beforebegin', starterResultHtml());
-  } else if (!hasResult && existingMsg) {
-    existingMsg.remove();
   }
 }
 

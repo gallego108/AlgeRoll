@@ -51,6 +51,7 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 - **Hover sin giro**: al pasar el ratón el dado solo se eleva ligeramente; no vuelve a rotar después del lanzamiento inicial.
 - **Identificador del dado** (`#1…#5`) en una etiqueta bajo cada cubo, en flujo normal, para que no quede oculto por las caras 3D.
 - El resultado se lee directamente en la cara del cubo (se eliminó la píldora redundante inferior).
+- **Dado de “¿Quién empieza?”**: termina el giro ya orientado a la cara obtenida y el resultado se lee en el propio cubo; no se muestra un texto redundante con el valor.
 
 ### v1.2 · Acabado visual
 
