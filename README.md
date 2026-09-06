@@ -1,4 +1,4 @@
-# AlgeRoll · Versión definitiva 1.2
+# AlgeRoll · Versión definitiva 1.3
 
 Versión local jugable de **AlgeRoll · Desafíos algebraicos**, construida a partir de las instrucciones, cartas y decisiones funcionales documentadas en `AlgeRoll_Especificacion_Funcional_Tecnica.md`.
 
@@ -40,13 +40,22 @@ npm test
 
 La entrega se valida con el runner integrado de Node.js y no descarga dependencias.
 
-## Novedades visuales de la versión 1.2
+## Novedades visuales
 
-- **Cinco dados cúbicos 3D reales en CSS**, cada uno con las seis caras físicas `1`, `2`, `x`, `y`, `x²`, `y²`. En reposo se aprecia volumen (cara principal, lateral y superior/inferior), no una simple cara plana.
-- **Giro 3D más lento y legible**: el lanzamiento dura aproximadamente 3,5–3,9 segundos incluyendo los pequeños desfases entre dados, para apreciar con claridad el giro y la caída.
-- **Corrección de orientación de caras**: la orientación del resultado y la inclinación visual del cubo usan envolventes 3D separadas; así `1`, `2`, `x`, `x²`, `y` y `y²` quedan vinculadas de forma fiable a la cara obtenida.
+### v1.3 · Dados corregidos
+
+- **Cubos 3D reales**: cada dado muestra físicamente sus seis caras `1`, `2`, `x`, `y`, `x²`, `y²`. Ninguna regla aplica `filter`/`opacity` sobre el árbol `preserve-3d`, así que las caras nunca colapsan a una tarjeta plana.
+- **Resultado de frente en reposo**: al terminar el lanzamiento el cubo queda alineado con la pantalla mostrando **una sola cara** (la del resultado). Se eliminó la inclinación isométrica estable que dejaba ver tres caras.
+- **Exponentes correctos**: en `x²`/`y²` el `2` es un superíndice real (el símbolo se envuelve en un contenedor inline); ya no aparece pegado en la parte baja de la cara.
+- **Orientación de caras corregida**: cada resultado queda vinculado de forma fiable a su cara; se corrigió la orientación vertical de `y`/`y²`.
+- **Hover sin giro**: al pasar el ratón el dado solo se eleva ligeramente; no vuelve a rotar después del lanzamiento inicial.
+- **Identificador del dado** (`#1…#5`) en una etiqueta bajo cada cubo, en flujo normal, para que no quede oculto por las caras 3D.
+- El resultado se lee directamente en la cara del cubo (se eliminó la píldora redundante inferior).
+
+### v1.2 · Acabado visual
+
+- **Giro 3D pausado y legible**: el lanzamiento dura aproximadamente 3,5–3,9 segundos incluyendo los pequeños desfases entre dados, para apreciar con claridad el giro y la caída. Al terminar, el giro vuelve a la orientación exacta del resultado.
 - **Cinco posiciones de dado siempre visibles** en la bandeja. Mientras un dado está dentro de un término, su posición original queda marcada como “En la expresión”, evitando que parezca que faltan dados.
-- **Etiqueta redundante del resultado** debajo de cada cubo (`1`, `2`, `x`, `x²`, `y`, `y²`) para que el resultado sea inequívoco aun durante la transición visual.
 - **Vista ampliada del algeplano**: al pasar el cursor por una carta de reto con algeplano (o enfocarla con teclado), se abre automáticamente una previsualización grande y centrada de la figura.
 - Las caras opuestas se representan también físicamente en el cubo: `1↔2`, `x↔x²`, `y↔y²`.
 - Al pulsar **Lanzar dados**, cada cubo se eleva, rota sobre los tres ejes y cae mostrando el resultado aleatorio.

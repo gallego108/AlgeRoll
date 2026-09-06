@@ -40,15 +40,23 @@ La estrategia visual obligatoria del MVP es híbrida:
 
 ---
 
-### 0.2 Nota de implementación visual de dados (v1.2)
+### 0.2 Nota de implementación visual de dados (v1.3)
 
 **[ACORDADO / CORRECCIÓN DE IMPLEMENTACIÓN]** Los cinco dados deben percibirse inequívocamente como **cubos tridimensionales**, no como cuadrados planos. Cada dado conserva físicamente las seis caras `1`, `2`, `x`, `y`, `x²`, `y²`, con pares opuestos `1↔2`, `x↔x²` y `y↔y²`.
 
-La implementación debe separar dos transformaciones 3D: (1) la orientación interior que coloca la cara obtenida hacia el usuario y (2) una inclinación exterior isométrica que deja ver volumen del cubo. Durante el lanzamiento, la envolvente exterior rota en los tres ejes y al terminar vuelve a la inclinación estable, mientras la orientación interior queda fijada al resultado aleatorio.
+La implementación separa dos transformaciones 3D: (1) la orientación interior que coloca la cara obtenida hacia el usuario y (2) una envolvente exterior que **solo rota durante el lanzamiento** y aterriza sin inclinación residual. En reposo el cubo queda **alineado con la pantalla mostrando una sola cara**: la del resultado aleatorio. Se eliminó la inclinación isométrica estable (v1.2) porque dificultaba leer la cara obtenida.
 
-La bandeja de dados debe reservar **cinco posiciones visibles**. Mientras un dado esté colocado en una caja de término, su posición en la bandeja puede mostrar un marcador “En la expresión”, pero el usuario siempre debe poder reconocer que existen exactamente cinco dados físicos. Además del símbolo visible sobre la cara del cubo, la interfaz debe mostrar una etiqueta textual redundante con el resultado (`1`, `2`, `x`, `y`, `x²`, `y²`) para eliminar ambigüedades visuales.
+Reglas de construcción obligatorias del cubo:
 
-La animación de lanzamiento debe ser suficientemente pausada para apreciar el giro 3D, con una duración aproximada de 3,5 a 3,9 segundos incluyendo pequeños desfases entre dados.
+- el 3D se define dentro de la escena (`perspective` + `transform-style: preserve-3d`); **ningún contenedor del árbol 3D puede llevar `filter`, `opacity` ni propiedades de agrupación** (las aplanan las caras y el dado se percibe como una tarjeta plana que solo muestra su cara frontal);
+- la orientación de cada resultado debe ser fiable y correcta, incluida la vertical de `y`/`y²`;
+- los exponentes de `x²`/`y²` deben dibujarse como **superíndice real**; el símbolo debe envolverse en un contenedor inline para que el `<sup>` no se convierta en una celda propia dentro del contenedor grid de la cara;
+- la etiqueta identificadora del dado (`#1…#5`) se coloca **debajo del cubo, en flujo normal**, fuera del espacio 3D, para que ninguna cara pueda ocultarla;
+- la bandeja reserva **cinco posiciones visibles**: mientras un dado esté en una caja de término, su posición muestra el marcador “En la expresión” y el usuario siempre reconoce que existen exactamente cinco dados físicos;
+- el resultado se muestra en la propia cara del cubo; **no** se requiere una píldora textual redundante bajo el dado;
+- el `hover` no debe volver a girar el dado después del lanzamiento: únicamente puede elevarlo o resaltarlo.
+
+La animación de lanzamiento debe ser suficientemente pausada para apreciar el giro 3D, con una duración aproximada de 3,5 a 3,9 segundos incluyendo pequeños desfases entre dados, y debe terminar **sin giro residual** sobre la cara obtenida.
 
 ---
 

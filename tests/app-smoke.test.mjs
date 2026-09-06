@@ -40,7 +40,7 @@ test('flujo mínimo: setup -> partida solitaria -> lanzamiento -> colocar un dad
   assert.equal((fakeApp.innerHTML.match(/class="dice-scene/g) || []).length >= 5, true, 'deben renderizarse los cinco cubos');
   assert.equal((fakeApp.innerHTML.match(/class="cube-face cube-front"/g) || []).length >= 5, true, 'cada cubo debe tener cara frontal');
   assert.equal((fakeApp.innerHTML.match(/class="cube-face cube-back"/g) || []).length >= 5, true, 'cada cubo debe tener cara opuesta');
-  assert.equal((fakeApp.innerHTML.match(/die-result-label/g) || []).length, 5, 'cada dado debe mostrar además su resultado textual');
+  assert.equal((fakeApp.innerHTML.match(/die-result-label/g) || []).length, 0, 'el resultado no debe depender de una píldora inferior: lo muestra la propia cara del cubo');
   const cubeCases = [
     ['1', 'show-front'], ['2', 'show-back'], ['x', 'show-right'],
     ['x2', 'show-left'], ['y', 'show-top'], ['y2', 'show-bottom'],

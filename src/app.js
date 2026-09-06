@@ -776,12 +776,12 @@ function renderDiceCube(face, { rolling = false, mini = false, hidden = false } 
   return `<span class="dice-scene ${mini ? 'mini' : ''}" aria-hidden="true" data-visible-face="${escapeHtml(face || '1')}">
     <span class="dice-tilt ${rolling ? 'is-rolling' : ''}">
       <span class="dice-cube ${sideClass} ${hidden ? 'is-hidden-face' : ''}">
-        <span class="cube-face cube-front">${hidden ? '?' : renderFaceSymbol('1')}</span>
-        <span class="cube-face cube-back">${hidden ? '?' : renderFaceSymbol('2')}</span>
-        <span class="cube-face cube-right">${hidden ? '?' : renderFaceSymbol('x')}</span>
-        <span class="cube-face cube-left">${hidden ? '?' : renderFaceSymbol('x2')}</span>
-        <span class="cube-face cube-top">${hidden ? '?' : renderFaceSymbol('y')}</span>
-        <span class="cube-face cube-bottom">${hidden ? '?' : renderFaceSymbol('y2')}</span>
+        <span class="cube-face cube-front"><span class="face-val">${hidden ? '?' : renderFaceSymbol('1')}</span></span>
+        <span class="cube-face cube-back"><span class="face-val">${hidden ? '?' : renderFaceSymbol('2')}</span></span>
+        <span class="cube-face cube-right"><span class="face-val">${hidden ? '?' : renderFaceSymbol('x')}</span></span>
+        <span class="cube-face cube-left"><span class="face-val">${hidden ? '?' : renderFaceSymbol('x2')}</span></span>
+        <span class="cube-face cube-top"><span class="face-val">${hidden ? '?' : renderFaceSymbol('y')}</span></span>
+        <span class="cube-face cube-bottom"><span class="face-val">${hidden ? '?' : renderFaceSymbol('y2')}</span></span>
       </span>
     </span>
   </span>`;
@@ -890,15 +890,12 @@ function renderDie(die, context = 'pool') {
       data-die-id="${die.id}" draggable="${!die.locked && state.hasRolled && !rolling}"
       aria-label="Dado ${die.id.replace('die-','')} con ${FACE_LABELS[displayFace]}${die.locked ? ', bloqueado' : ''}">
       ${renderDiceCube(displayFace, { rolling, hidden })}
-      <span class="die-number">${die.id.replace('die-','')}</span>
-      <span class="die-result-label" aria-hidden="true">${hidden ? '—' : renderFaceSymbol(displayFace)}</span>
       ${die.locked ? '<span class="lock-badge" aria-hidden="true">🔒</span>' : ''}
     </button>`;
 }
 
 function renderDicePool() {
   const inTerms = new Set(state.terms.flatMap((t) => t.factors.filter((f) => f.kind === 'die').map((f) => f.dieId)));
-  const poolDice = state.dice.filter((d) => !inTerms.has(d.id));
   const interactionSelectsDice = state.interaction && ['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','CHOOSE_DICE_FACES'].includes(state.interaction.card.effect);
   return `
     <section class="dice-section ${interactionSelectsDice ? 'selection-mode' : ''}">
@@ -910,7 +907,7 @@ function renderDicePool() {
             return `<div class="dice-slot ${isInTerm ? 'occupied-in-term' : ''}" data-dice-slot="${die.id}">
               ${isInTerm
                 ? `<span class="dice-slot-placeholder"><strong>Dado ${die.id.replace('die-','')}</strong><small>En la expresión</small></span>`
-                : renderDie(die)}
+                : `${renderDie(die)}<span class="die-number" aria-hidden="true">${die.id.replace('die-','')}</span>`}
             </div>`;
           }).join('')}
         </div>

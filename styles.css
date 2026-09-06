@@ -338,14 +338,16 @@ body::before {
 }
 
 /* ---------- DADOS 3D ---------- */
+/* El 3D vive dentro de .dice-scene (perspective + preserve-3d). El botón no
+   debe crear su propio contexto 3D: así, el identificador (.die-number), el
+   candado o los avisos pintan delante de la cara frontal y no quedan ocultos
+   detrás del cubo (la cara frontal tiene translateZ positivo). */
 .die-3d, .term-die-3d {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
   overflow: visible;
   padding: 0;
-  perspective: 700px;
-  transform-style: preserve-3d;
 }
 
 .die-3d {
@@ -379,11 +381,8 @@ body::before {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform .62s cubic-bezier(.18,.82,.22,1), filter .2s ease;
-  filter: drop-shadow(0 11px 8px rgba(45,34,65,.20));
+  transition: transform .62s cubic-bezier(.18,.82,.22,1);
 }
-
-.dice-scene.mini .dice-cube { filter: drop-shadow(0 7px 5px rgba(45,34,65,.16)); }
 
 .cube-face {
   position: absolute;
@@ -454,29 +453,27 @@ body::before {
   100% { transform: translateY(0) rotateX(1080deg) rotateY(1080deg) rotateZ(360deg) scale(1); }
 }
 
-.die-3d:hover:not(.locked) .dice-cube:not(.is-rolling),
-.term-die-3d:hover .dice-cube:not(.is-rolling) {
-  filter: drop-shadow(0 15px 10px rgba(45,34,65,.25)) brightness(1.03);
-}
-
 .die-3d:hover:not(.locked) { transform: translateY(-3px); }
 .term-die-3d:hover { transform: translateY(-2px); }
 
 .die-3d.locked .dice-cube { filter: grayscale(.55) opacity(.58) drop-shadow(0 5px 5px rgba(45,34,65,.12)); }
+/* Identificador del dado: va en flujo normal bajo el cubo (el slot es una
+   columna), de modo que ninguna cara 3D pueda taparlo. */
 .die-number {
-  position: absolute;
-  left: 4px;
-  bottom: -3px;
-  min-width: 22px;
-  height: 22px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: var(--alg-purple-dark);
-  color: white;
-  font-size: .67rem;
-  font-weight: 900;
-  box-shadow: 0 3px 8px rgba(0,0,0,.18);
+  background: #fff;
+  border: 2px solid var(--alg-purple-dark);
+  color: var(--alg-purple-dark);
+  font-size: .74rem;
+  font-weight: 1000;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(38,24,61,.16);
+  pointer-events: none;
 }
 
 .die-3d .lock-badge { top: -7px; right: -3px; z-index: 8; }
@@ -600,7 +597,7 @@ body::before {
   border: 2px solid rgba(50,32,95,.18);
 }
 .card-corner.top-left { top: 10px; left: 10px; }
-.card-corner.bottom-right { bottom: 10px; right: 10px; transform: rotate(180deg); }
+.card-corner.bottom-right { bottom: 10px; right: 10px; }
 
 .challenge-card-body {
   min-height: 190px;
@@ -998,28 +995,8 @@ body::before {
   transform: translateY(-2px) rotateX(-19deg) rotateY(25deg) scale(1.025);
 }
 
-/* Resultado textual redundante: evita cualquier duda sobre la cara obtenida,
-   además de servir como comprobación visual del cubo 3D. */
-.die-result-label {
-  position: absolute;
-  right: 1px;
-  bottom: -10px;
-  min-width: 34px;
-  height: 25px;
-  padding: 0 7px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: #fff;
-  border: 2px solid var(--alg-purple-dark);
-  color: var(--alg-purple-dark);
-  box-shadow: 0 3px 8px rgba(38,24,61,.16);
-  font-size: .78rem;
-  line-height: 1;
-  font-weight: 1000;
-  z-index: 12;
-}
-.die-result-label sup { font-size: .62em; }
+/* El resultado se muestra en la propia cara del cubo (eliminada la píldora
+   redundante inferior en v1.3). */
 
 /* Bandeja de cinco posiciones fijas. En escritorio los 5 dados quedan visibles
    simultáneamente; en pantallas estrechas se conserva la fila y se permite
@@ -1045,9 +1022,12 @@ body::before {
 
 .dice-slot {
   width: 104px;
-  min-height: 108px;
-  display: grid;
-  place-items: center;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   position: relative;
 }
 
@@ -1080,9 +1060,82 @@ body::before {
     gap: 10px;
   }
   .dice-slot { width: 92px; }
-  .die-result-label { bottom: -8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .dice-tilt.is-rolling { animation: none !important; }
+}
+
+/* =============================================================
+   v1.3 - Dados cúbicos con resultado de frente
+   - Un `filter` sobre el contenedor `preserve-3d` (.dice-cube)
+     aplana las seis caras y hace que solo se vea la cara frontal
+     como una tarjeta plana girando. Se elimina de todo el árbol 3D.
+   - Reposo sin inclinación isométrica: al terminar el giro una sola
+     cara (la del resultado) queda mirando a la pantalla.
+   - Orientación vertical corregida para y / y².
+   ============================================================= */
+
+.dice-cube,
+.dice-scene.mini .dice-cube {
+  filter: none;
+}
+
+.die-3d:hover:not(.locked) .dice-cube,
+.term-die-3d:hover .dice-cube,
+.die-3d.locked .dice-cube {
+  filter: none;
+  opacity: 1;
+}
+
+.die-3d.locked .cube-face {
+  filter: none;
+  background: #e9e6f0;
+  border-color: #a89fc0;
+  color: #8d86a3;
+  box-shadow: none;
+}
+
+.dice-tilt,
+.dice-scene.mini .dice-tilt,
+.starter-die-3d .dice-tilt {
+  transform: none;
+}
+
+.die-3d:hover:not(.locked) .dice-tilt:not(.is-rolling),
+.term-die-3d:hover .dice-tilt:not(.is-rolling) {
+  transform: translateY(-3px);
+}
+
+.face-val {
+  display: inline;
+  line-height: 1;
+}
+.face-val sup {
+  font-size: .5em;
+  vertical-align: 1.5em;
+}
+
+.dice-cube.show-front  { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+.dice-cube.show-back   { transform: rotateY(180deg); }
+.dice-cube.show-right  { transform: rotateY(-90deg); }
+.dice-cube.show-left   { transform: rotateY(90deg); }
+.dice-cube.show-top    { transform: rotateX(-90deg); }
+.dice-cube.show-bottom { transform: rotateX(90deg); }
+
+@keyframes cube-tumble-3d-v13 {
+  0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+  10%  { transform: translate3d(0,-44px,20px) rotateX(150deg) rotateY(120deg) rotateZ(35deg) scale(1.07); }
+  24%  { transform: translate3d(0,-22px,8px) rotateX(300deg) rotateY(260deg) rotateZ(90deg) scale(1.01); }
+  38%  { transform: translate3d(0,-40px,24px) rotateX(455deg) rotateY(405deg) rotateZ(155deg) scale(1.05); }
+  52%  { transform: translate3d(0,-18px,6px) rotateX(610deg) rotateY(555deg) rotateZ(220deg) scale(1); }
+  66%  { transform: translate3d(0,-34px,16px) rotateX(755deg) rotateY(710deg) rotateZ(285deg) scale(1.04); }
+  79%  { transform: translate3d(0,-12px,4px) rotateX(905deg) rotateY(850deg) rotateZ(335deg) scale(.99); }
+  90%  { transform: translate3d(0,-20px,9px) rotateX(1015deg) rotateY(960deg) rotateZ(360deg) scale(1.01); }
+  100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); }
+}
+
+.dice-tilt.is-rolling {
+  animation: cube-tumble-3d-v13 3.55s cubic-bezier(.16,.48,.18,1) both;
+  transition: none;
 }
