@@ -748,7 +748,7 @@ body::before {
 
 .help-hand {
   gap: 16px;
-  padding: 12px 8px 24px;
+  padding: 36px 8px 24px;
   perspective: 1400px;
   min-height: 270px;
   align-items: flex-end;

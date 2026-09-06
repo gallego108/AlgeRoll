@@ -180,13 +180,12 @@ function startGame() {
 
 async function rollStarterDie() {
   if (state.starterRolling) return;
+  const face = randomFace();
   state.starterRolling = true;
-  state.starterLastRoll = null;
+  state.starterLastRoll = face;
   state.starterTumble = randomTumbleVariant();
   render();
   await wait(STARTER_DIE_ROLL_DURATION_MS);
-  const face = randomFace();
-  state.starterLastRoll = face;
   state.starterRolling = false;
   state.starterTumble = null;
   if (face === '1') {
@@ -860,9 +859,18 @@ function renderSetup() {
     </main>`;
 }
 
-function renderStarter() {
+function starterResultHtml() {
+  return `<p class="starter-result">Ha salido ${renderFaceSymbol(state.starterLastRoll)}. Continúa el siguiente jugador.</p>`;
+}
+
+function starterButtonLabel() {
+  return state.starterRolling ? 'Girando…' : 'Tirar para empezar';
+}
+
+function renderStarterFull() {
   const player = state.players[state.starterIndex];
-  app.innerHTML = `
+  const hasResult = !!(state.starterLastRoll && !state.starterRolling && state.starterLastRoll !== '1');
+  return `
     <main class="starter-screen">
       <section class="starter-card">
         <div class="logo small"><span>ALGE</span><strong>ROLL</strong></div>
@@ -870,10 +878,58 @@ function renderStarter() {
         <p>Empieza el primer jugador que saque <strong>1</strong>.</p>
         <div class="starter-player">Turno de <strong>${escapeHtml(player.name)}</strong></div>
         <div class="starter-die-3d ${state.starterRolling ? 'rolling' : ''}">${renderDiceCube(state.starterLastRoll || '1', { rolling: state.starterRolling, hidden: !state.starterLastRoll && !state.starterRolling, tumble: state.starterRolling ? state.starterTumble || '' : '' })}</div>
-        ${state.starterLastRoll && state.starterLastRoll !== '1' ? `<p class="starter-result">Ha salido ${renderFaceSymbol(state.starterLastRoll)}. Continúa el siguiente jugador.</p>` : ''}
-        <button class="primary giant" data-action="starter-roll" ${state.starterRolling ? 'disabled' : ''}>${state.starterRolling ? 'Girando…' : 'Tirar para empezar'}</button>
+        ${hasResult ? starterResultHtml() : ''}
+        <button class="primary giant" data-action="starter-roll" ${state.starterRolling ? 'disabled' : ''}>${starterButtonLabel()}</button>
       </section>
     </main>`;
+}
+
+function starterCardEl() {
+  try {
+    return typeof app?.querySelector === 'function' ? app.querySelector('.starter-card') : null;
+  } catch {
+    return null;
+  }
+}
+
+function renderStarter() {
+  const player = state.players[state.starterIndex];
+  const card = starterCardEl();
+  if (!card) {
+    app.innerHTML = renderStarterFull();
+    return;
+  }
+
+  const nameStrong = card.querySelector('.starter-player strong');
+  if (nameStrong && nameStrong.textContent !== player.name) nameStrong.textContent = player.name;
+
+  const dieWrap = card.querySelector('.starter-die-3d');
+  if (dieWrap) {
+    dieWrap.classList.toggle('rolling', state.starterRolling);
+    if (state.starterRolling) {
+      dieWrap.innerHTML = renderDiceCube(state.starterLastRoll || '1', { rolling: true, hidden: false, tumble: state.starterTumble || '' });
+    } else {
+      const tilt = dieWrap.querySelector('.dice-tilt');
+      if (tilt) {
+        tilt.classList.remove('is-rolling', 'tumble-b', 'tumble-c', 'tumble-d', 'tumble-e', 'tumble-f');
+      }
+    }
+  }
+
+  const btn = card.querySelector('[data-action="starter-roll"]');
+  if (btn) {
+    btn.disabled = state.starterRolling;
+    btn.textContent = starterButtonLabel();
+  }
+
+  const hasResult = !!(state.starterLastRoll && !state.starterRolling && state.starterLastRoll !== '1');
+  const existingMsg = card.querySelector('.starter-result');
+  if (hasResult && !existingMsg) {
+    const ref = card.querySelector('[data-action="starter-roll"]') || dieWrap;
+    ref.insertAdjacentHTML('beforebegin', starterResultHtml());
+  } else if (!hasResult && existingMsg) {
+    existingMsg.remove();
+  }
 }
 
 function renderScoreboard() {
@@ -1236,9 +1292,43 @@ function renderGame() {
   }
 
   const htmls = currentZoneHtmls(player, selectedChallenge, needsAnswer);
-  for (const [name, html] of htmls) setZoneHtml(name, html);
+  for (const [name, html] of htmls) {
+    if (name === 'challenges') continue;
+    setZoneHtml(name, html);
+  }
+  syncChallengesZone();
   syncHelpActivePanel();
   syncDiceSectionMode();
+}
+
+// Seleccionar una carta de reto solo cambia el estado visual de esa carta:
+// no debe reconstruirse toda la rejilla (evita que las cartas desaparezcan
+// y se reparta la animación de nuevo). Solo se reconstruye cuando el conjunto
+// de retos visibles cambia (nuevo reparto).
+function syncChallengesZone() {
+  const grid = zoneNode('challenges');
+  const html = renderChallenges();
+  if (!grid) {
+    zoneSnapshot.set('challenges', html);
+    return;
+  }
+  const desired = state.visibleChallenges.map((c) => c.id);
+  const existing = [...grid.querySelectorAll('.challenge-card')];
+  const sameSet = desired.length > 0
+    && existing.length === desired.length
+    && existing.every((node, index) => node.dataset.challengeId === desired[index]);
+  if (!sameSet) {
+    setZoneHtml('challenges', html);
+    return;
+  }
+  existing.forEach((node) => {
+    const selected = state.selectedChallengeId === node.dataset.challengeId;
+    if (node.classList.contains('selected') !== selected) {
+      node.classList.toggle('selected', selected);
+      node.setAttribute('aria-pressed', String(selected));
+    }
+  });
+  zoneSnapshot.set('challenges', html);
 }
 
 function renderFinal() {
