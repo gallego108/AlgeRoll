@@ -42,6 +42,10 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 
 ## Novedades visuales
 
+### v1.3.2 · Créditos
+
+- **Autoría visible**: la pantalla de inicio muestra en la esquina inferior izquierda *“Juego didáctico diseñado por la Lic. en Matemáticas Viviana Bermudez Herrera.”*
+
 ### v1.3 · Dados corregidos
 
 - **Cubos 3D reales**: cada dado muestra físicamente sus seis caras `1`, `2`, `x`, `y`, `x²`, `y²`. Ninguna regla aplica `filter`/`opacity` sobre el árbol `preserve-3d`, así que las caras nunca colapsan a una tarjeta plana.

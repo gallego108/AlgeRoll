@@ -856,6 +856,7 @@ function renderSetup() {
         </div>
         <button class="primary giant" data-action="start-game">Comenzar partida</button>
       </section>
+      <p class="setup-credit">Juego didáctico diseñado por la Lic. en Matemáticas Viviana Bermudez Herrera.</p>
     </main>`;
 }
 

@@ -86,6 +86,7 @@ button:focus-visible, input:focus-visible, [data-term-box]:focus-visible { outli
   position: relative;
   z-index: 2;
 }
+.setup-credit { position: absolute; left: 22px; bottom: 16px; margin: 0; z-index: 2; font-size: .8rem; color: var(--alg-purple-dark); background: rgba(255,255,255,.8); padding: 6px 12px; border-radius: 999px; box-shadow: 0 3px 10px rgba(48,31,90,.12); }
 .decor { position: absolute; pointer-events: none; user-select: none; }
 .decor-grid { width: 320px; left: -20px; top: -20px; opacity: .8; }
 .decor-purple { width: 340px; right: -80px; top: -40px; }

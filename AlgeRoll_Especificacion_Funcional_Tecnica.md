@@ -903,6 +903,8 @@ La aplicación debe parecer una mesa de juego educativa inspirada en las instruc
 
 ## 15.2 Pantalla A - Configuración
 
+**[ACORDADO v1.3.2]** La pantalla de inicio debe mostrar, en la **esquina inferior izquierda**, la línea de crédito/autoría: **“Juego didáctico diseñado por la Lic. en Matemáticas Viviana Bermudez Herrera.”** Se presenta como una etiqueta discreta y legible (píldora translúcida) anclada abajo a la izquierda, sin interferir con la tarjeta central de configuración ni con la decoración.
+
 Elementos:
 
 - logotipo/título textual `ALGEROLL`;
@@ -911,6 +913,7 @@ Elementos:
 - inputs de nombres;
 - resumen breve de reglas;
 - botón `Comenzar`;
+- crédito de autoría en la esquina inferior izquierda (`Juego didáctico diseñado por la Lic. en Matemáticas Viviana Bermudez Herrera.`);
 - decoración con dado y peones del banco de imágenes.
 
 ## 15.3 Pantalla B - Determinar inicio
