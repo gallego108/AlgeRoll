@@ -1,4 +1,4 @@
-# AlgeRoll · Versión definitiva 1.3
+# AlgeRoll · Versión definitiva 1.3.3
 
 Versión local jugable de **AlgeRoll · Desafíos algebraicos**, construida a partir de las instrucciones, cartas y decisiones funcionales documentadas en `AlgeRoll_Especificacion_Funcional_Tecnica.md`.
 
@@ -42,6 +42,12 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 
 ## Novedades visuales
 
+### v1.3.3 · Mesa de juego y aviso de turno
+
+- **Cartas de ayuda a la derecha de los dados**: en escritorio la zona de dados y la mano de ayudas comparten una fila (dados a la izquierda, ayudas a la derecha); la mano se reparte en varias filas dentro de su panel sin scroll horizontal. En pantallas de hasta 1100 px la fila se apila en una sola columna para no reducir los dados ni ocultar cartas.
+- **Aviso de turno en multijugador**: al comenzar cada turno (incluido el primer jugador tras la fase “Empieza quien saque 1”) aparece un popup con el nombre del jugador activo y un botón **Comenzar turno** que cierra el aviso. En modo solitario no se muestra.
+- El panel contextual de una carta de ayuda se mantiene a ancho completo sobre la fila de dados y ayudas.
+
 ### v1.3.2 · Créditos
 
 - **Autoría visible**: la pantalla de inicio muestra en la esquina inferior izquierda *“Juego didáctico diseñado por la Lic. en Matemáticas Viviana Bermudez Herrera.”*
@@ -81,6 +87,7 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 - 1 a 5 jugadores en un único dispositivo.
 - Modo solitario de máxima puntuación.
 - Fase de **Empieza quien saque 1** en multijugador.
+- Aviso de turno con el jugador activo al comenzar cada turno en multijugador.
 - 5 dados especiales con `1`, `2`, `x`, `y`, `x²`, `y²`.
 - Caras opuestas: `1↔2`, `x↔x²`, `y↔y²`.
 - 4 cajas fijas de términos.
@@ -93,6 +100,7 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 - Validación automática de retos.
 - Retos de evaluación numérica con entrada de respuesta cuando corresponde.
 - 40 cartas de ayuda según la distribución documentada.
+- Mano de ayudas situada a la derecha de la zona de dados en escritorio.
 - Ayudas sobre dados, factores, términos y expresión.
 - Fichas virtuales visualmente distintas de los dados.
 - Hasta 2 retos por turno con bloqueo de dados físicos ya usados.

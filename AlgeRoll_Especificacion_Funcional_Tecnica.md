@@ -1,6 +1,6 @@
 # AlgeRoll - Especificación funcional, técnica y banco de imágenes
 
-**Versión de especificación:** 1.2 - MVP navegable local  
+**Versión de especificación:** 1.3.3 - MVP navegable local  
 **Destino:** implementación asistida por OpenCode, Codex u otro agente de desarrollo en un equipo local  
 **Tipo de producto:** juego de mesa virtual educativo, ejecutado en navegador, sin backend en el MVP  
 **Idioma de interfaz:** español  
@@ -923,7 +923,8 @@ Solo multijugador:
 - mostrar jugador al que corresponde tirar;
 - botón `Tirar para empezar`;
 - el dado gira y queda orientado a la cara obtenida; el resultado se lee en la propia cara del cubo (sin texto redundante);
-- cuando aparezca `1`, anunciar primer jugador y habilitar `Ir a la mesa`.
+- cuando aparezca `1`, anunciar primer jugador y habilitar `Ir a la mesa`;
+- **[ACORDADO v1.3.3]** al entrar en la mesa, el primer jugador ve el aviso de turno descrito en 15.4 (popup con su nombre y botón `Comenzar turno`).
 
 ## 15.4 Pantalla C - Mesa principal
 
@@ -949,18 +950,19 @@ Cada carta muestra:
 - estado seleccionado;
 - estado ganado/retirado si corresponde.
 
-### Zona de dados
+### Zona de dados y mano de ayudas
+
+**[ACORDADO v1.3.3]** La zona de dados y la mano de ayudas comparten una misma fila en escritorio: los dados a la izquierda y las cartas de ayuda a su derecha. En pantallas de hasta 1100 px la fila se apila en una sola columna.
 
 - cinco dados grandes;
 - botón `Lanzar dados` al inicio;
 - después del lanzamiento, dados arrastrables;
-- dados bloqueados con candado/opacity tras ganar un reto.
-
-### Mano de ayudas
-
-- cartas accesibles mediante una bandeja horizontal o panel plegable;
+- dados bloqueados con candado/opacity tras ganar un reto;
+- cartas de ayuda junto a los dados, en formato vertical;
 - el texto completo debe poder leerse;
-- indicar si una carta no puede usarse en el estado actual.
+- indicar si una carta no puede usarse en el estado actual;
+- la mano se reparte en varias filas dentro de su panel cuando no cabe en una sola;
+- el panel contextual de una carta de ayuda (modo selección) se muestra a ancho completo por encima de la fila de dados y ayudas.
 
 ### Constructor
 
@@ -988,6 +990,15 @@ Dos líneas:
 - `Comprobar reto`
 - `Pasar turno`
 - opcional `Limpiar cajas` (solo devuelve dados no bloqueados; no revierte cartas ya consumidas)
+
+### Aviso de turno (multijugador)
+
+**[ACORDADO v1.3.3]** En partidas de 2 a 5 jugadores, al comenzar cada turno se muestra un popup centrado que indica **qué jugador tiene el turno**. Se presenta sobre un fondo atenuado y contiene:
+
+- el nombre del jugador activo;
+- el botón `Comenzar turno`, que cierra el aviso y habilita la mesa.
+
+El aviso aparece al iniciar la mesa tras la fase de primer jugador y cada vez que se pasa el turno al siguiente jugador. En modo de un jugador no se muestra. Mientras el aviso está visible, la mesa queda cubierta para evitar acciones accidentales.
 
 ## 15.5 Modales/paneles de ayuda
 

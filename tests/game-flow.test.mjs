@@ -60,6 +60,39 @@ test('pasar sin reto roba una ayuda y prepara un nuevo turno', async () => {
   assert.equal(s.turnWins, 0);
 });
 
+test('en multijugador el aviso de turno aparece al cambiar de jugador', async () => {
+  const { listeners } = fakeDocument();
+  await import(`../src/app.js?popup=${Date.now()}`);
+  const click = listeners.get('click');
+  await click(clickable({ count:'2' }));
+  await click(clickable({ action:'start-game' }));
+  const s = globalThis.__ALGEROLL__.state;
+  // Saltamos la fase de "¿Quién empieza?" para probar el cambio de turno.
+  s.screen = 'game';
+  s.hasRolled = true;
+  s.turnPopup = false;
+
+  await click(clickable({ action:'pass-turn' }));
+  assert.equal(s.currentPlayerIndex, 1);
+  assert.equal(s.turnPopup, true);
+  assert.match(s.players[1].name, /Jugador 2/);
+
+  await click(clickable({ action:'start-turn' }));
+  assert.equal(s.turnPopup, false);
+});
+
+test('en solitario no aparece el aviso de turno', async () => {
+  const { listeners } = fakeDocument();
+  await import(`../src/app.js?solo=${Date.now()}`);
+  const click = listeners.get('click');
+  await click(clickable({ action:'start-game' }));
+  const s = globalThis.__ALGEROLL__.state;
+  s.hasRolled = true;
+
+  await click(clickable({ action:'pass-turn' }));
+  assert.equal(s.turnPopup, false);
+});
+
 test('carta de cara opuesta modifica el dado y se descarta', async () => {
   const { listeners } = fakeDocument();
   await import(`../src/app.js?help=${Date.now()}`);

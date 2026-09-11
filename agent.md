@@ -513,6 +513,22 @@ Debe mostrarse claramente:
 - turno;
 - retos ganados en ese turno.
 
+## 23.1 Aviso de turno
+
+En partidas de 2 a 5 jugadores, al comenzar cada turno debe aparecer un **popup** que indique el jugador que tiene el turno.
+
+Comportamiento:
+
+- aparece al iniciar la mesa tras la fase de primer jugador;
+- aparece cada vez que se pasa el turno al siguiente jugador;
+- muestra el nombre del jugador activo y un botón para comenzar el turno;
+- no se muestra en el modo de un jugador;
+- mientras está visible cubre la mesa para evitar acciones accidentales.
+
+## 23.2 Disposición de la mesa
+
+Las cartas de ayuda deben situarse **a la derecha de los dados** en escritorio, en la misma fila. La mano de ayudas se reparte en varias filas dentro de su panel cuando no cabe en una sola. En pantallas estrechas (hasta 1100 px) la fila se apila en una sola columna, sin reducir los dados ni ocultar cartas.
+
 ---
 
 # 24. Empates
@@ -605,6 +621,7 @@ App
 │   │   └── TermBox x4
 │   ├── HelpHand
 │   │   └── HelpCard
+│   ├── TurnPopup
 │   └── TurnControls
 ├── ImagePreview
 └── EndGameScreen
@@ -872,7 +889,8 @@ En pantallas pequeñas:
 - permitir scroll;
 - no reducir los dados hasta hacerlos ilegibles;
 - no ocultar cartas;
-- no superponer controles.
+- no superponer controles;
+- apilar en una sola columna la fila dados + ayudas cuando no quepan lado a lado (hasta 1100 px).
 
 ---
 

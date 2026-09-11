@@ -49,6 +49,7 @@ const state = {
   interaction: null,
   moveSelection: null,
   gameEndReason: '',
+  turnPopup: false,
 };
 
 function createEmptyTerm(index) {
@@ -78,6 +79,7 @@ function resetTurn() {
   state.rollingTumble = new Map();
   state.starterTumble = null;
   state.message = null;
+  state.turnPopup = false;
 }
 
 function setMessage(text, type = 'info') {
@@ -195,6 +197,7 @@ async function rollStarterDie() {
     await wait(900);
     state.screen = 'game';
     resetTurn();
+    if (state.players.length > 1) state.turnPopup = true;
   } else {
     state.starterIndex = (state.starterIndex + 1) % state.players.length;
   }
@@ -368,6 +371,12 @@ function endTurn(voluntary = true) {
   }
   state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
   resetTurn();
+  if (state.players.length > 1) state.turnPopup = true;
+  render();
+}
+
+function closeTurnPopup() {
+  state.turnPopup = false;
   render();
 }
 
@@ -1195,16 +1204,35 @@ function syncHelpActivePanel() {
   const current = zoneNode('help-active');
   if (helpPanelSnapshot === html && (!!html) === !!current) return;
   helpPanelSnapshot = html;
-  const parent = zoneNode('dice')?.parentNode;
+  const diceZone = zoneNode('dice');
+  const row = typeof diceZone?.closest === 'function' ? diceZone.closest('.play-row') : null;
+  const anchor = row || diceZone;
+  const parent = anchor?.parentNode;
   if (current) current.remove();
   if (!html || !parent) return;
   const tpl = document.createElement('template');
   tpl.innerHTML = html;
-  parent.insertBefore(tpl.content.firstElementChild, zoneNode('dice'));
+  parent.insertBefore(tpl.content.firstElementChild, anchor);
 }
 
 function turnInfoHtml(player) {
   return `<span>Turno actual</span><strong>${escapeHtml(player.name)}</strong><small>${state.turnWins}/2 retos logrados</small>`;
+}
+
+// Aviso de turno para multijugador local: al comenzar cada turno se muestra
+// quién juega para que los jugadores puedan pasarse el dispositivo.
+function renderTurnPopup() {
+  if (!state.turnPopup || state.players.length <= 1) return '';
+  const player = currentPlayer();
+  return `
+    <div class="turn-popup-backdrop">
+      <div class="turn-popup-card" role="dialog" aria-modal="true" aria-label="Turno actual">
+        <span class="turn-popup-eyebrow">Turno actual</span>
+        <h2>${escapeHtml(player.name)}</h2>
+        <p>Es tu turno. Cuando estés listo, comienza la ronda.</p>
+        <button class="primary giant" data-action="start-turn">Comenzar turno</button>
+      </div>
+    </div>`;
 }
 
 function challengeTitleHtml() {
@@ -1234,6 +1262,7 @@ function currentZoneHtmls(player, selectedChallenge, needsAnswer) {
     ['help', renderHelpHandBody()],
     ['status', statusAreaHtml(needsAnswer, selectedChallenge)],
     ['actions', mainActionsHtml()],
+    ['turn-popup', renderTurnPopup()],
   ]);
 }
 
@@ -1255,14 +1284,17 @@ function renderGameFull() {
       </section>
 
       ${renderHelpPanel()}
-      <section class="dice-section ${diceSelectionMode() ? 'selection-mode' : ''}" data-zone="dice">${renderDiceBody()}</section>
+      <div class="play-row">
+        <section class="dice-section ${diceSelectionMode() ? 'selection-mode' : ''}" data-zone="dice">${renderDiceBody()}</section>
+        <section class="help-section" data-zone="help">${renderHelpHandBody()}</section>
+      </div>
       <section class="builder-section" data-zone="builder">${renderBuilderBody()}</section>
-      <section class="help-section" data-zone="help">${renderHelpHandBody()}</section>
 
       <section class="action-bar">
         <div class="status-area" data-zone="status">${statusAreaHtml(needsAnswer, selectedChallenge)}</div>
         <div class="main-actions" data-zone="actions">${mainActionsHtml()}</div>
       </section>
+      <div class="turn-popup-zone" data-zone="turn-popup">${renderTurnPopup()}</div>
     </main>`;
 }
 
@@ -1376,6 +1408,7 @@ app.addEventListener('click', (event) => {
   if (action === 'remove-new-face') return removeNewFaceFromInteraction();
   if (action === 'count-minus') return changeInteractionCount(-1);
   if (action === 'count-plus') return changeInteractionCount(1);
+  if (action === 'start-turn') return closeTurnPopup();
   if (action === 'restart') return restartToSetup();
 
   if (target.dataset.choiceDie && target.dataset.choiceFace) return chooseInteractionFace(target.dataset.choiceDie, target.dataset.choiceFace);
