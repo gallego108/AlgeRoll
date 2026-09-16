@@ -1,4 +1,4 @@
-import { FACES, FACE_LABELS, OPPOSITE_FACE, DIFFICULTY, DICE_COUNT, TERM_BOX_COUNT, VISIBLE_CHALLENGES, MAX_CHALLENGES_PER_TURN } from './constants.js';
+import { FACES, FACE_LABELS, OPPOSITE_FACE, DIFFICULTY, DICE_COUNT, TERM_BOX_COUNT, VISIBLE_CHALLENGES, MAX_CHALLENGES_PER_TURN, HELP_HAND_SIZE } from './constants.js';
 import {
   faceToMonomial,
   simplifyTerm,
@@ -80,6 +80,19 @@ function resetTurn() {
   state.starterTumble = null;
   state.message = null;
   state.turnPopup = false;
+  refillHelpHand();
+}
+
+// Al comenzar cada turno el jugador siempre dispone de dos cartas de ayuda.
+// Si le quedan menos (porque las gastó), se completan desde el mazo.
+function refillHelpHand() {
+  const player = currentPlayer();
+  if (!player) return;
+  while (player.hand.length < HELP_HAND_SIZE) {
+    const card = state.helpDeck.shift();
+    if (!card) break;
+    player.hand.push(card);
+  }
 }
 
 function setMessage(text, type = 'info') {
@@ -166,7 +179,7 @@ function startGame() {
   }
   for (const player of state.players) {
     player.hand = [];
-    for (let i = 0; i < 2; i += 1) {
+    for (let i = 0; i < HELP_HAND_SIZE; i += 1) {
       const card = state.helpDeck.shift();
       if (card) player.hand.push(card);
     }
@@ -330,8 +343,17 @@ async function checkChallenge() {
     return;
   }
 
+  const remainingDice = state.dice.filter((d) => !d.locked).length;
+  if (remainingDice === 0) {
+    setMessage(`¡Reto conseguido! +${points} ${points === 1 ? 'punto' : 'puntos'}. Te quedaste sin dados: el turno termina.`, 'success');
+    render();
+    await wait(1100);
+    endTurn(false);
+    return;
+  }
+
   resetAttempt();
-  setMessage(`¡Reto conseguido! +${points}. Puedes intentar un segundo reto con los dados restantes o pasar turno.`, 'success');
+  setMessage(`¡Reto conseguido! +${points}. Te quedan ${remainingDice} ${remainingDice === 1 ? 'dado' : 'dados'}. Puedes intentar otro reto o pasar turno.`, 'success');
   render();
 }
 
@@ -992,7 +1014,7 @@ function renderDiceBody() {
     </div>
     <div class="dice-actions">
       <button class="primary roll-button" data-action="launch-dice" ${state.hasRolled || state.rollingDice.size ? 'disabled' : ''}>🎲 ${state.hasRolled ? 'Dados lanzados' : 'Lanzar dados'}</button>
-      ${state.dice.some((d) => d.locked) ? `<span class="locked-note">🔒 ${state.dice.filter((d) => d.locked).length} dado(s) usado(s) en el primer reto</span>` : ''}
+      ${state.dice.some((d) => d.locked) ? `<span class="locked-note">🔒 ${state.dice.filter((d) => d.locked).length} dado(s) usado(s) en retos anteriores</span>` : ''}
     </div>`;
 }
 
@@ -1216,7 +1238,7 @@ function syncHelpActivePanel() {
 }
 
 function turnInfoHtml(player) {
-  return `<span>Turno actual</span><strong>${escapeHtml(player.name)}</strong><small>${state.turnWins}/2 retos logrados</small>`;
+  return `<span>Turno actual</span><strong>${escapeHtml(player.name)}</strong><small>${state.turnWins}/${MAX_CHALLENGES_PER_TURN} retos logrados</small>`;
 }
 
 // Aviso de turno para multijugador local: al comenzar cada turno se muestra

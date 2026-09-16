@@ -101,7 +101,7 @@ La implementación debe preservar estos objetivos. En particular, los retos repr
 - Cuatro retos visibles en la mesa.
 - Selección de reto y comprobación automática.
 - Uso de cartas de ayuda, tanto sobre dados como sobre términos/expresión.
-- Hasta dos retos ganados por turno utilizando conjuntos de dados disjuntos.
+- Hasta cuatro retos ganados por turno utilizando conjuntos de dados disjuntos.
 - Botón de **Pasar turno**.
 - Puntuación por dificultad.
 - Final de partida y pantalla de resultados.
@@ -213,7 +213,7 @@ No debe existir ponderación por dificultad, turno, jugador ni cartas visibles.
 
 **[ACORDADO]** El jugador puede utilizar cualquier cantidad de sus cinco dados. No está obligado a usar todos.
 
-Los dados no utilizados permanecen disponibles para reorganizar el intento o para un posible segundo reto del mismo turno.
+Los dados no utilizados permanecen disponibles para reorganizar el intento o para un posible reto posterior del mismo turno.
 
 ### 4.7 Un dado no se duplica
 
@@ -391,6 +391,8 @@ Al iniciar:
 
 Las cartas restantes forman el mazo de ayuda boca abajo.
 
+**[ACORDADO]** Al comenzar cada turno el jugador siempre dispone de **2 cartas de ayuda**: si le quedan menos (porque las gastó en turnos anteriores), se completan desde el mazo hasta llegar a 2.
+
 ### 8.4 Retos visibles
 
 **[FUENTE]** Se extraen 4 retos del mazo y se colocan visibles en el centro.
@@ -497,19 +499,21 @@ No existe límite de comprobaciones por turno.
 - La carta pasa a la colección del jugador.
 - Se suman sus puntos.
 - Todos los **dados físicos utilizados** en esa expresión quedan bloqueados para el resto del turno.
-- Las ayudas de expresión/fichas virtuales utilizadas en ese intento no se transfieren a un segundo reto.
+- Las ayudas de expresión/fichas virtuales utilizadas en ese intento no se transfieren a los retos siguientes.
 - Las cajas se limpian para construir una nueva expresión con los dados físicos restantes.
-- Los retos visibles no se reponen todavía: el segundo intento se realiza con los retos que siguen sobre la mesa.
+- Los retos visibles no se reponen todavía: el siguiente intento se realiza con los retos que siguen sobre la mesa.
 
 **[FUENTE]** Un mismo dado no puede usarse para dos retos distintos.
 
-### 9.10 Segundo reto
+### 9.10 Retos siguientes
 
-**[FUENTE]** El jugador puede llevarse una segunda carta si puede resolver otro reto con los dados restantes.
+**[FUENTE]** El jugador puede llevarse más cartas si puede resolver otros retos con los dados restantes.
 
-Máximo: **2 retos ganados por turno**.
+Máximo: **4 retos ganados por turno**.
 
-Después del segundo reto el turno termina.
+Después del cuarto reto el turno termina.
+
+**[ACORDADO]** El turno también termina automáticamente cuando el jugador se queda **sin dados disponibles** (todos los dados físicos usados quedaron bloqueados) o cuando pulsa **Pasar turno**.
 
 ### 9.11 Pasar turno
 
@@ -520,8 +524,8 @@ No es necesario que el software demuestre matemáticamente que ningún reto pued
 Comportamiento:
 
 - Si el jugador no ganó ningún reto: termina el turno y roba **1 carta de ayuda** para usar en un turno posterior.
-- Si el jugador ya ganó 1 reto: puede terminar voluntariamente el turno, pero **no roba ayuda**.
-- Si ganó 2 retos: el turno finaliza sin ayuda adicional.
+- Si el jugador ya ganó retos: puede terminar voluntariamente el turno, pero **no roba ayuda**.
+- Si ganó 4 retos o se quedó sin dados: el turno finaliza sin ayuda adicional.
 
 **[FUENTE]** Si no logra cumplir ningún reto, obtiene una carta de ayuda para el siguiente turno.
 
@@ -653,7 +657,7 @@ Reglas:
 - deben mostrar claramente `x`, `y`, `x²`, `y²`, `1` o `2`;
 - pertenecen al intento de reto actual;
 - no se consideran dados físicos y no entran en la regla “un mismo dado no puede usarse para dos retos”;
-- no deben transferirse al segundo reto del turno;
+- no deben transferirse a los retos siguientes del turno;
 - si hay muchas fichas idénticas, la UI puede agruparlas visualmente como `x × 12`, pero el modelo conserva la cantidad real;
 - las cartas H05/H07 no tienen máximo de regla; no introducir un límite matemático artificial.
 
@@ -677,13 +681,13 @@ Ejemplo: seleccionar `2`, `2`, `x²` produce `4x²`.
 
 Las ayudas de dado modifican el estado físico/efectivo del dado y persisten mientras ese dado siga disponible en el turno.
 
-Las ayudas de término/expresión se asocian al intento de reto actual. Al ganar un reto y pasar al posible segundo intento, se reinician sus efectos y fichas virtuales.
+Las ayudas de término/expresión se asocian al intento de reto actual. Al ganar un reto y pasar al posible siguiente intento, se reinician sus efectos y fichas virtuales.
 
 ### 12.6 Procedencia y bloqueo
 
 Si un término fue modificado, convertido o multiplicado mediante ayuda, los `dieId` físicos que contribuyeron a ese término siguen formando parte de su procedencia. Si ese reto se gana, esos dados se bloquean para el resto del turno, aunque el valor final del término haya sido transformado.
 
-Esto evita que una carta como “Convierte un término en 1” permita reciclar los mismos dados para un segundo reto.
+Esto evita que una carta como “Convierte un término en 1” permita reciclar los mismos dados para un reto posterior.
 
 ---
 
@@ -1018,7 +1022,7 @@ Tipos:
 - fallo: `Todavía no cumple el reto`;
 - ayuda usada: `Carta aplicada`;
 - paso sin reto: `Recibes 1 carta de ayuda`;
-- segundo reto: `Te quedan N dados disponibles`;
+- reto siguiente: `Te quedan N dados disponibles`; el turno termina si ya no quedan dados;
 - fin de turno;
 - fin de partida.
 
@@ -1707,11 +1711,11 @@ No bloquear el MVP si esto retrasa la versión jugable.
 
 ### 33.4 Flujo de turno
 
-1. inicio reparte 2 ayudas por jugador;
+1. inicio reparte 2 ayudas por jugador y cada turno se completan hasta 2;
 2. mesa inicia con 4 retos;
 3. ganar 1 reto bloquea solo dados usados;
-4. segundo reto no puede usar dados bloqueados;
-5. máximo 2 retos por turno;
+4. los retos siguientes no pueden usar dados bloqueados;
+5. máximo 4 retos por turno o hasta quedarse sin dados;
 6. pasar sin ganar roba 1 ayuda;
 7. pasar tras ganar 1 no roba ayuda;
 8. ayuda confirmada se descarta;
@@ -1748,9 +1752,9 @@ Una comprobación fallida no finaliza el turno ni bloquea dados.
 
 Una victoria suma puntos, retira reto y bloquea los dados físicos utilizados.
 
-### AC-06 Segunda victoria
+### AC-06 Retos posteriores
 
-El segundo reto solo puede construirse con dados físicos no bloqueados.
+Los retos siguientes solo pueden construirse con dados físicos no bloqueados.
 
 ### AC-07 Pasar sin reto
 
@@ -2116,8 +2120,8 @@ El prototipo está listo cuando:
 - [ ] no inventa los 9 retos fuente pendientes;
 - [ ] los retos algeplano muestran sus imágenes;
 - [ ] un fallo permite modificar y reintentar;
-- [ ] se pueden ganar máximo 2 retos por turno;
-- [ ] un dado usado en el primer reto no puede usarse en el segundo;
+- [ ] se pueden ganar máximo 4 retos por turno o hasta quedarse sin dados;
+- [ ] un dado usado en un reto no puede reutilizarse en los retos siguientes;
 - [ ] `Pasar turno` roba 1 ayuda solo si no se ganó reto;
 - [ ] al final del turno se reponen retos;
 - [ ] puntúa 1/2/3 por dificultad;
@@ -2192,7 +2196,7 @@ Puede usarse este documento completo como contexto y dar al agente una instrucci
 
 # 45. Resumen final de comportamiento no negociable
 
-Al pulsar **Lanzar dados**, los cinco dados giran y caen aleatoriamente en una de seis caras. El jugador puede utilizar cartas para relanzar o cambiar dados, arrastrarlos libremente entre cuatro cajas de términos y construir una expresión donde cada caja multiplica su contenido y las cajas se suman. Puede usar ayudas adicionales para transformar términos o la expresión. El sistema simplifica automáticamente y comprueba el reto seleccionado. Si falla, puede reorganizar y volver a intentar. Si gana, obtiene puntos y los dados físicos usados quedan bloqueados; con los restantes puede intentar un segundo reto. Si no puede o no quiere continuar, dispone de **Pasar turno**; si no ganó ningún reto roba una ayuda. La partida continúa por turnos hasta que se agota uno de los mazos. En multijugador gana la puntuación máxima y se permiten empates; en solitario el objetivo es maximizar el resultado.
+Al pulsar **Lanzar dados**, los cinco dados giran y caen aleatoriamente en una de seis caras. El jugador puede utilizar cartas para relanzar o cambiar dados, arrastrarlos libremente entre cuatro cajas de términos y construir una expresión donde cada caja multiplica su contenido y las cajas se suman. Puede usar ayudas adicionales para transformar términos o la expresión. El sistema simplifica automáticamente y comprueba el reto seleccionado. Si falla, puede reorganizar y volver a intentar. Si gana, obtiene puntos y los dados físicos usados quedan bloqueados; con los restantes puede intentar más retos hasta un máximo de cuatro o hasta quedarse sin dados. Si no puede o no quiere continuar, dispone de **Pasar turno**; si no ganó ningún reto roba una ayuda. Al comenzar cada turno el jugador siempre cuenta con dos cartas de ayuda. La partida continúa por turnos hasta que se agota uno de los mazos. En multijugador gana la puntuación máxima y se permiten empates; en solitario el objetivo es maximizar el resultado.
 
 Ese flujo es el corazón del producto y debe permanecer claro, rápido y visual en toda la implementación.
 

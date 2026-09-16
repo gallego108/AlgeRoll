@@ -103,8 +103,9 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 - Mano de ayudas situada a la derecha de la zona de dados en escritorio.
 - Ayudas sobre dados, factores, términos y expresión.
 - Fichas virtuales visualmente distintas de los dados.
-- Hasta 2 retos por turno con bloqueo de dados físicos ya usados.
+- Hasta 4 retos por turno (o menos si el jugador se queda sin dados) con bloqueo de dados físicos ya usados.
 - Botón **Pasar turno**; si no se consiguió ningún reto, el jugador roba 1 ayuda.
+- Al comenzar cada turno el jugador siempre tiene 2 cartas de ayuda: se completan desde el mazo si le quedan menos.
 - Puntuación: fácil 1, intermedio 2, difícil 3.
 - Final por agotamiento de uno de los mazos y empates válidos.
 - Assets visuales originales incluidos localmente.
@@ -147,11 +148,12 @@ AlgeRoll_Definitivo/
 - Los factores pueden ordenarse libremente.
 - Cada dado físico solo se puede usar una vez dentro de una expresión.
 - El orden visual de los factores se conserva, pero la validación utiliza la expresión simplificada.
-- Un dado usado para ganar el primer reto queda bloqueado para el posible segundo reto del turno.
+- Un dado usado para ganar un reto queda bloqueado para los retos siguientes del turno.
 - Si una comprobación falla, el jugador puede reorganizar su expresión y volver a intentarlo.
 - Las fichas creadas por ayudas pertenecen al intento actual.
 - Las modificaciones físicas de dados mediante cartas persisten durante el turno.
-- Las modificaciones de la expresión se reinician al pasar al segundo reto.
+- Las modificaciones de la expresión se reinician al pasar al siguiente reto.
+- El turno termina al cuarto reto, al quedarse sin dados disponibles o al pulsar Pasar turno.
 - El reto “Expresión donde un término sea el doble de otro” se comprueba sobre la estructura de las cajas antes de combinar términos semejantes.
 
 ## Fuente funcional

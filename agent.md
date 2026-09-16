@@ -188,9 +188,9 @@ En su turno el jugador:
 7. si acierta:
    - gana la carta;
    - recibe sus puntos;
-   - los dados utilizados quedan bloqueados para un posible segundo reto;
-8. puede intentar un segundo reto con los dados restantes;
-9. como máximo puede ganar **2 retos por turno**;
+   - los dados utilizados quedan bloqueados para los retos siguientes;
+8. puede intentar más retos con los dados restantes;
+9. como máximo puede ganar **4 retos por turno**, o menos si se queda sin dados;
 10. puede pulsar **Pasar turno**.
 
 ---
@@ -214,9 +214,9 @@ Comportamiento:
 - puede pasar;
 - no recibe carta adicional de ayuda.
 
-### Si consiguió 2 retos
+### Si consiguió retos
 
-- el turno termina normalmente.
+- el turno termina normalmente (hasta 4 retos, o antes si se queda sin dados).
 
 El sistema no necesita demostrar matemáticamente que no existe una solución antes de permitir pasar.
 
@@ -224,12 +224,12 @@ La decisión de pasar pertenece al jugador.
 
 ---
 
-# 8. Segundo reto del turno
+# 8. Retos siguientes del turno
 
 Si el jugador gana un reto:
 
 - los dados usados quedan bloqueados;
-- esos dados no pueden reutilizarse en un segundo reto;
+- esos dados no pueden reutilizarse en los retos siguientes;
 - los dados restantes sí pueden usarse;
 - las fichas creadas por ayudas deben manejarse según la semántica específica de la carta;
 - un mismo dado físico nunca puede contarse dos veces en retos distintos del mismo turno.
@@ -455,6 +455,8 @@ No modificar únicamente el texto en pantalla.
 Cada jugador comienza con:
 
 **2 cartas de ayuda**
+
+Al comenzar cada turno, si al jugador le quedan menos de 2 cartas de ayuda, se completan desde el mazo hasta tener 2.
 
 Las cartas deben verse físicamente como cartas.
 
@@ -1015,7 +1017,7 @@ El proyecto debe tener pruebas para:
 
 ## Turnos
 
-- máximo 2 retos por turno;
+- máximo 4 retos por turno, o hasta quedarse sin dados;
 - dados usados quedan bloqueados;
 - pasar sin reto entrega ayuda;
 - pasar tras 1 reto no entrega ayuda;
@@ -1145,7 +1147,7 @@ Una versión es aceptable cuando un usuario puede:
 10. usar ayudas;
 11. seleccionar retos;
 12. comprobarlos;
-13. ganar hasta 2 retos;
+13. ganar hasta 4 retos;
 14. pasar turno;
 15. recibir ayuda si corresponde;
 16. completar una partida;

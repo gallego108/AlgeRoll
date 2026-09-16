@@ -112,3 +112,43 @@ test('carta de cara opuesta modifica el dado y se descarta', async () => {
   assert.equal(s.players[0].hand.length, 0);
   assert.equal(s.helpDiscard.at(-1).id, 'H03');
 });
+
+test('al comenzar cada turno la mano de ayuda vuelve a tener dos cartas', async () => {
+  const { listeners } = fakeDocument();
+  await import(`../src/app.js?refill=${Date.now()}`);
+  const click = listeners.get('click');
+  await click(clickable({ action:'start-game' }));
+  const s = globalThis.__ALGEROLL__.state;
+  s.players[0].hand = [];
+  s.hasRolled = true;
+  s.turnWins = 1;
+
+  await click(clickable({ action:'pass-turn' }));
+
+  assert.equal(s.players[0].hand.length, 2);
+});
+
+test('el turno termina al quedarse sin dados tras ganar un reto', async () => {
+  const { listeners } = fakeDocument();
+  await import(`../src/app.js?nodice=${Date.now()}`);
+  const click = listeners.get('click');
+  await click(clickable({ action:'start-game' }));
+  const s = globalThis.__ALGEROLL__.state;
+  s.hasRolled = true;
+  const faces = ['x', 'y', '1', 'x2', 'y2'];
+  s.dice.forEach((d, i) => { d.face = faces[i]; });
+  s.terms[0].factors.push({ id:'f-d1', kind:'die', dieId:'die-1', overrideFace:null });
+  s.terms[0].factors.push({ id:'f-d2', kind:'die', dieId:'die-2', overrideFace:null });
+  s.terms[0].factors.push({ id:'f-d3', kind:'die', dieId:'die-3', overrideFace:null });
+  s.terms[1].factors.push({ id:'f-d4', kind:'die', dieId:'die-4', overrideFace:null });
+  s.terms[1].factors.push({ id:'f-d5', kind:'die', dieId:'die-5', overrideFace:null });
+  s.visibleChallenges = [CHALLENGES.find((c) => c.id === 'E01'), ...CHALLENGES.filter((c) => c.id !== 'E01').slice(0, 3)];
+
+  await click(clickable({ challengeId:'E01' }));
+  await click(clickable({ action:'check-challenge' }));
+
+  assert.equal(s.players[0].score, 1);
+  assert.equal(s.hasRolled, false);
+  assert.equal(s.turnWins, 0);
+  assert.equal(s.dice.every((d) => !d.locked), true);
+});
