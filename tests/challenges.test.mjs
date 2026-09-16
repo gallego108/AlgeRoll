@@ -45,9 +45,21 @@ test('D02: compara la respuesta introducida con la evaluación', () => {
   assert.equal(validateChallenge(challenge('D02'), ctx(poly, { evaluationAnswer:'5' })), false);
 });
 
+test('D02: exige términos con x e y, no solo un número', () => {
+  const constant = p(mono(4,0,0)); // 4 para (1,4)
+  assert.equal(validateChallenge(challenge('D02'), ctx(constant, { evaluationAnswer:'4' })), false);
+});
+
 test('D03 y D05: predicados de evaluación', () => {
-  assert.equal(validateChallenge(challenge('D03'), ctx(p(mono(4,1,0)))), true); // 12 < 15
-  assert.equal(validateChallenge(challenge('D03'), ctx(p(mono(5,1,0)))), false); // 15 !< 15
-  assert.equal(validateChallenge(challenge('D05'), ctx(p(mono(2,0,1)))), true); // 6 < 7
-  assert.equal(validateChallenge(challenge('D05'), ctx(p(mono(3,0,1)))), false); // 9 !< 7
+  assert.equal(validateChallenge(challenge('D03'), ctx(p(mono(4,1,0), mono(1,0,1)))), true); // 13 < 15
+  assert.equal(validateChallenge(challenge('D03'), ctx(p(mono(5,1,0), mono(1,0,1)))), false); // 16 !< 15
+  assert.equal(validateChallenge(challenge('D05'), ctx(p(mono(2,1,0), mono(1,0,1)))), true); // 5 < 7
+  assert.equal(validateChallenge(challenge('D05'), ctx(p(mono(1,1,0), mono(2,0,1)))), false); // 7 !< 7
+});
+
+test('D03 y D05: exigen términos con x e y, no solo un número', () => {
+  assert.equal(validateChallenge(challenge('D03'), ctx(p(mono(1,0,0)))), false); // 1 < 15, pero sin variables
+  assert.equal(validateChallenge(challenge('D03'), ctx(p(mono(1,1,0)))), false); // 3 < 15, pero sin y
+  assert.equal(validateChallenge(challenge('D05'), ctx(p(mono(1,0,0)))), false); // 1 < 7, pero sin variables
+  assert.equal(validateChallenge(challenge('D05'), ctx(p(mono(1,0,1)))), false); // 3 < 7, pero sin x
 });

@@ -21,8 +21,8 @@ export const CHALLENGES = [
   { id:'I05', difficulty:'intermediate', text:'Representación con algeplano', image:'assets/algebra_tiles/challenge_2y_plus_3y2.png', validator:{ type:'EXACT_POLYNOMIAL', target:p(mono(3,0,2), mono(2,0,1)) } },
 
   { id:'D01', difficulty:'hard', text:'2x + 2y + 1', validator:{ type:'EXACT_POLYNOMIAL', target:p(mono(2,1,0), mono(2,0,1), mono(1,0,0)) } },
-  { id:'D02', difficulty:'hard', text:'Di el resultado de tu expresión si x = 1 e y = 4', validator:{ type:'EVALUATE_AND_ANSWER', x:1, y:4 } },
-  { id:'D03', difficulty:'hard', text:'Si x = 3 e y = 1, el resultado es < 15', validator:{ type:'EVALUATION_PREDICATE', x:3, y:1, operator:'<', value:15 } },
+  { id:'D02', difficulty:'hard', text:'Di el resultado de tu expresión si x = 1 e y = 4 (debe incluir x e y)', validator:{ type:'EVALUATE_AND_ANSWER', x:1, y:4, requireBothVariables:true } },
+  { id:'D03', difficulty:'hard', text:'Si x = 3 e y = 1, el resultado es < 15 (debe incluir x e y)', validator:{ type:'EVALUATION_PREDICATE', x:3, y:1, operator:'<', value:15, requireBothVariables:true } },
   { id:'D04', difficulty:'hard', text:'Representación con algeplano', image:'assets/algebra_tiles/challenge_xy_plus_x2_plus_2.png', validator:{ type:'EXACT_POLYNOMIAL', target:p(mono(1,2,0), mono(1,1,1), mono(2,0,0)) } },
-  { id:'D05', difficulty:'hard', text:'Si x = 1 e y = 3, el resultado es < 7', validator:{ type:'EVALUATION_PREDICATE', x:1, y:3, operator:'<', value:7 } },
+  { id:'D05', difficulty:'hard', text:'Si x = 1 e y = 3, el resultado es < 7 (debe incluir x e y)', validator:{ type:'EVALUATION_PREDICATE', x:1, y:3, operator:'<', value:7, requireBothVariables:true } },
 ];

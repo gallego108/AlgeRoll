@@ -163,6 +163,17 @@ export function hasQuadraticTerm(poly) {
   return polynomialTerms(poly).some((m) => m.xPow + m.yPow === 2);
 }
 
+export function hasBothVariables(poly) {
+  let hasX = false;
+  let hasY = false;
+  for (const key of poly.keys()) {
+    const [xPow, yPow] = key.split(',').map(Number);
+    if (xPow > 0) hasX = true;
+    if (yPow > 0) hasY = true;
+  }
+  return hasX && hasY;
+}
+
 export function hasStructuralDoubleTerm(terms, diceById) {
   const values = terms.map((t) => simplifyTerm(t, diceById)).filter(Boolean);
   for (let i = 0; i < values.length; i += 1) {

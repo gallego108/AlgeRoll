@@ -479,6 +479,28 @@ body::before {
 .die-3d .lock-badge { top: -7px; right: -3px; z-index: 8; }
 .term-die-3d small { z-index: 8; }
 
+/* Ficha plana usada como imagen de arrastre para evitar que la captura del
+   cubo 3D aparezca girada (caso de las caras y e y²). */
+.drag-ghost {
+  position: fixed;
+  top: -1000px;
+  left: -1000px;
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #fff, #fff9de);
+  border: 3px solid var(--alg-purple-dark);
+  color: #1c1724;
+  font-size: 2.1rem;
+  font-weight: 1000;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(38,24,61,.28);
+  pointer-events: none;
+}
+.drag-ghost sup { font-size: .55em; vertical-align: super; }
+
 .starter-die-3d {
   width: 155px;
   height: 155px;
@@ -488,7 +510,8 @@ body::before {
   perspective: 800px;
 }
 .starter-die-3d .dice-scene { transform: scale(1.42); }
-.starter-die-3d.rolling .dice-cube { animation-duration: 2.4s; }
+/* El dado inicial gira a la mitad de velocidad que los dados de partida. */
+.starter-die-3d .dice-tilt.is-rolling { animation-duration: 1.78s; }
 
 .dice-pool {
   overflow: visible;

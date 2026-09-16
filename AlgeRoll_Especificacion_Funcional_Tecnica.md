@@ -148,7 +148,7 @@ La implementación debe preservar estos objetivos. En particular, los retos repr
 - 1 a 5 jugadores.
 - Duración aproximada de 20 minutos.
 - Edad de referencia 11+.
-- Empieza quien saque 1.
+- Empieza quien saque x o y.
 
 ### 3.2 Material digital del MVP
 
@@ -401,11 +401,13 @@ Las cartas restantes forman el mazo de ayuda boca abajo.
 
 **[FUENTE]** “Empieza quien saque 1”.
 
+**[ACORDADO]** Para no alargar la espera se aceptan las caras `x` e `y`, de modo que la probabilidad de empezar por tirada es de 2 de 6 (33 %). La cara `1` no inicia.
+
 **[DECISIÓN MVP]** En multijugador local se implementará una fase de inicio:
 
 - los jugadores, en el orden de registro, lanzan virtualmente un dado especial;
-- el primer jugador que obtenga `1` comienza;
-- si termina una ronda completa sin que aparezca `1`, se repite;
+- el primer jugador que obtenga `x` o `y` comienza;
+- si termina una ronda completa sin que aparezca una de esas caras, se repite;
 - en modo de un jugador esta fase se omite.
 
 **[ACORDADO v1.3.1]** El resultado de la tirada inicial se muestra **en la propia cara del cubo** al terminar el giro; **no** se muestra un texto redundante con el valor (p. ej. “Ha salido …”). El giro aterriza ya orientado a la cara obtenida, sin re-render que vuelva a mostrar el valor.
@@ -741,10 +743,10 @@ Puntuación: **3 puntos** cada una.
 | ID | Posición fuente | Contenido visible | Tipo | Regla exacta |
 |---|---|---|---|---|
 | D01 | Fila 9, col. 2 | `2x + 2y + 1` | `EXACT_POLYNOMIAL` | Igualdad exacta con `2x + 2y + 1`. |
-| D02 | Fila 9, col. 3 | Di el resultado de tu expresión si: `x=1` y `y=4` | `EVALUATE_AND_ANSWER` | El jugador puede construir cualquier expresión válida; debe introducir el valor numérico de su expresión para `x=1, y=4`. El sistema calcula y compara la respuesta. |
-| D03 | Fila 10, col. 1 | Si `x=3`, `y=1`, el resultado es `< 15` | `EVALUATION_PREDICATE` | Evaluar la expresión en `(3,1)` y comprobar valor `< 15`. |
+| D02 | Fila 9, col. 3 | Di el resultado de tu expresión si: `x=1` y `y=4` | `EVALUATE_AND_ANSWER` | El jugador construye una expresión que debe incluir al menos un término con `x` y otro con `y`; debe introducir el valor numérico de su expresión para `x=1, y=4`. El sistema calcula y compara la respuesta. |
+| D03 | Fila 10, col. 1 | Si `x=3`, `y=1`, el resultado es `< 15` | `EVALUATION_PREDICATE` | La expresión debe incluir al menos un término con `x` y otro con `y`; se evalúa en `(3,1)` y se comprueba valor `< 15`. |
 | D04 | Fila 10, col. 2 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `xy + x² + 2`. Objetivo interno `x² + xy + 2`. |
-| D05 | Fila 10, col. 3 | Si `x=1`, `y=3`, el resultado es `< 7` | `EVALUATION_PREDICATE` | Evaluar en `(1,3)` y comprobar valor `< 7`. |
+| D05 | Fila 10, col. 3 | Si `x=1`, `y=3`, el resultado es `< 7` | `EVALUATION_PREDICATE` | La expresión debe incluir al menos un término con `x` y otro con `y`; se evalúa en `(1,3)` y se comprueba valor `< 7`. |
 
 ### 13.5 Reto eliminado
 
@@ -880,11 +882,13 @@ Los valores del MVP son enteros y las operaciones producen enteros no negativos.
 
 El reto D02 no exige una forma algebraica concreta; exige demostrar evaluación.
 
+**[ACORDADO]** Para evitar que un reto de evaluación se gane colocando solo un número, D02, D03 y D05 exigen que la expresión incluya **al menos un término con `x` y otro con `y`** (`requireBothVariables`). Si falta alguno, la comprobación falla y se avisa al jugador.
+
 Cuando D02 está seleccionado:
 
 - mostrar un campo numérico `Tu resultado`;
 - calcular internamente el valor para `x=1, y=4`;
-- la comprobación solo gana la carta si la respuesta del jugador coincide exactamente.
+- la comprobación solo gana la carta si la expresión usa `x` e `y` y la respuesta del jugador coincide exactamente.
 
 No revelar el resultado antes de que el jugador compruebe.
 
@@ -927,7 +931,7 @@ Solo multijugador:
 - mostrar jugador al que corresponde tirar;
 - botón `Tirar para empezar`;
 - el dado gira y queda orientado a la cara obtenida; el resultado se lee en la propia cara del cubo (sin texto redundante);
-- cuando aparezca `1`, anunciar primer jugador y habilitar `Ir a la mesa`;
+- cuando aparezca `x` o `y`, anunciar primer jugador y habilitar `Ir a la mesa`;
 - **[ACORDADO v1.3.3]** al entrar en la mesa, el primer jugador ve el aviso de turno descrito en 15.4 (popup con su nombre y botón `Comenzar turno`).
 
 ## 15.4 Pantalla C - Mesa principal
@@ -1377,8 +1381,8 @@ export type ChallengeRule =
   | { type: 'HAS_QUADRATIC_TERM' }
   | { type: 'EXACT_POLYNOMIAL'; target: Monomial[] }
   | { type: 'STRUCTURAL_DOUBLE_TERM' }
-  | { type: 'EVALUATION_PREDICATE'; x: number; y: number; op: '<'; value: number }
-  | { type: 'EVALUATE_AND_ANSWER'; x: number; y: number };
+  | { type: 'EVALUATION_PREDICATE'; x: number; y: number; op: '<'; value: number; requireBothVariables?: boolean }
+  | { type: 'EVALUATE_AND_ANSWER'; x: number; y: number; requireBothVariables?: boolean };
 
 export interface ChallengeDefinition {
   id: string;

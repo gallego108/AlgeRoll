@@ -45,7 +45,7 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 ### v1.3.3 · Mesa de juego y aviso de turno
 
 - **Cartas de ayuda a la derecha de los dados**: en escritorio la zona de dados y la mano de ayudas comparten una fila (dados a la izquierda, ayudas a la derecha); la mano se reparte en varias filas dentro de su panel sin scroll horizontal. En pantallas de hasta 1100 px la fila se apila en una sola columna para no reducir los dados ni ocultar cartas.
-- **Aviso de turno en multijugador**: al comenzar cada turno (incluido el primer jugador tras la fase “Empieza quien saque 1”) aparece un popup con el nombre del jugador activo y un botón **Comenzar turno** que cierra el aviso. En modo solitario no se muestra.
+- **Aviso de turno en multijugador**: al comenzar cada turno (incluido el primer jugador tras la fase “Empieza quien saque x o y”) aparece un popup con el nombre del jugador activo y un botón **Comenzar turno** que cierra el aviso. En modo solitario no se muestra.
 - El panel contextual de una carta de ayuda se mantiene a ancho completo sobre la fila de dados y ayudas.
 
 ### v1.3.2 · Créditos
@@ -86,7 +86,7 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 
 - 1 a 5 jugadores en un único dispositivo.
 - Modo solitario de máxima puntuación.
-- Fase de **Empieza quien saque 1** en multijugador.
+- Fase de **Empieza quien saque x o y** en multijugador.
 - Aviso de turno con el jugador activo al comenzar cada turno en multijugador.
 - 5 dados especiales con `1`, `2`, `x`, `y`, `x²`, `y²`.
 - Caras opuestas: `1↔2`, `x↔x²`, `y↔y²`.
@@ -155,6 +155,7 @@ AlgeRoll_Definitivo/
 - Las modificaciones de la expresión se reinician al pasar al siguiente reto.
 - El turno termina al cuarto reto, al quedarse sin dados disponibles o al pulsar Pasar turno.
 - El reto “Expresión donde un término sea el doble de otro” se comprueba sobre la estructura de las cajas antes de combinar términos semejantes.
+- Los retos de evaluación difíciles (D02, D03 y D05) exigen una expresión con términos de `x` y de `y`; no se ganan colocando solo un número.
 
 ## Fuente funcional
 

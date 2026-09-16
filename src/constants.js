@@ -1,5 +1,9 @@
 export const FACES = ['1', '2', 'x', 'y', 'x2', 'y2'];
 
+// Caras que permiten empezar la partida en la tirada inicial. Se aceptan x e y
+// para que la espera no se alargue (2 de 6 caras, un 33 % por tirada).
+export const STARTER_WINNING_FACES = ['x', 'y'];
+
 export const FACE_LABELS = {
   '1': '1',
   '2': '2',

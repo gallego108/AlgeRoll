@@ -1,4 +1,4 @@
-import { FACES, FACE_LABELS, OPPOSITE_FACE, DIFFICULTY, DICE_COUNT, TERM_BOX_COUNT, VISIBLE_CHALLENGES, MAX_CHALLENGES_PER_TURN, HELP_HAND_SIZE } from './constants.js';
+import { FACES, FACE_LABELS, OPPOSITE_FACE, DIFFICULTY, DICE_COUNT, TERM_BOX_COUNT, VISIBLE_CHALLENGES, MAX_CHALLENGES_PER_TURN, HELP_HAND_SIZE, STARTER_WINNING_FACES } from './constants.js';
 import {
   faceToMonomial,
   simplifyTerm,
@@ -10,6 +10,7 @@ import {
   hasQuadraticTerm,
   hasStructuralDoubleTerm,
   evaluatePolynomial,
+  hasBothVariables,
   sameMonomial,
   monomialIsSafe,
   polynomialIsSafe,
@@ -203,9 +204,9 @@ async function rollStarterDie() {
   await wait(STARTER_DIE_ROLL_DURATION_MS);
   state.starterRolling = false;
   state.starterTumble = null;
-  if (face === '1') {
+  if (STARTER_WINNING_FACES.includes(face)) {
     state.currentPlayerIndex = state.starterIndex;
-    setMessage(`${state.players[state.starterIndex].name} ha sacado 1 y comienza la partida.`, 'success');
+    setMessage(`${state.players[state.starterIndex].name} ha sacado ${FACE_LABELS[face]} y comienza la partida.`, 'success');
     render();
     await wait(900);
     state.screen = 'game';
@@ -224,7 +225,8 @@ function wait(ms) {
 // Duración deliberadamente pausada para que se aprecie el giro tridimensional de los dados.
 // Incluye un pequeño margen adicional sobre la animación CSS y sus desfases entre dados.
 const DICE_ROLL_DURATION_MS = 3850;
-const STARTER_DIE_ROLL_DURATION_MS = 3650;
+// El dado de "¿quién empieza?" gira a la mitad de velocidad (animación CSS de 1.78s).
+const STARTER_DIE_ROLL_DURATION_MS = 1825;
 
 function celebrate(kind = 'success') {
   if (typeof document === 'undefined' || typeof document.createElement !== 'function' || !document.body?.appendChild) return;
@@ -315,6 +317,11 @@ async function checkChallenge() {
   if (!challenge) return;
   if (challenge.validator.type === 'EVALUATE_AND_ANSWER' && state.evaluationAnswer.trim() === '') {
     setMessage('Escribe tu resultado numérico antes de comprobar.', 'warning');
+    render();
+    return;
+  }
+  if (challenge.validator.requireBothVariables && !hasBothVariables(expressionPoly())) {
+    setMessage('Este reto exige una expresión con términos de x y de y; no basta con un número.', 'warning');
     render();
     return;
   }
@@ -902,7 +909,7 @@ function renderStarterFull() {
       <section class="starter-card">
         <div class="logo small"><span>ALGE</span><strong>ROLL</strong></div>
         <h1>¿Quién empieza?</h1>
-        <p>Empieza el primer jugador que saque <strong>1</strong>.</p>
+        <p>Empieza el primer jugador que saque <strong>x</strong> o <strong>y</strong>.</p>
         <div class="starter-player">Turno de <strong>${escapeHtml(player.name)}</strong></div>
         <div class="starter-die-3d ${state.starterRolling ? 'rolling' : ''}">${renderDiceCube(state.starterLastRoll || '1', { rolling: state.starterRolling, hidden: !state.starterLastRoll && !state.starterRolling, tumble: state.starterRolling ? state.starterTumble || '' : '' })}</div>
         <button class="primary giant" data-action="starter-roll" ${state.starterRolling ? 'disabled' : ''}>${starterButtonLabel()}</button>
@@ -1495,7 +1502,22 @@ app.addEventListener('dragstart', (event) => {
     event.dataTransfer.setData('text/plain', JSON.stringify({ type:'die', dieId:el.dataset.dieId }));
   }
   event.dataTransfer.effectAllowed = 'move';
+  setFaceDragImage(event, el);
 });
+
+// Los cubos 3D (sobre todo las caras y/y², con el cubo girado 90° sobre X)
+// producen una imagen de arrastre girada al usar la captura nativa del
+// navegador. Se sustituye por una ficha plana con la cara efectiva del dado.
+function setFaceDragImage(event, el) {
+  const face = el.querySelector('.dice-scene')?.dataset.visibleFace;
+  if (!face || !event.dataTransfer?.setDragImage) return;
+  const ghost = document.createElement('div');
+  ghost.className = 'drag-ghost';
+  ghost.innerHTML = renderFaceSymbol(face);
+  document.body.appendChild(ghost);
+  event.dataTransfer.setDragImage(ghost, 34, 34);
+  window.setTimeout(() => ghost.remove(), 0);
+}
 
 app.addEventListener('dragover', (event) => {
   const zone = event.target.closest('[data-term-box], [data-drop-pool]');

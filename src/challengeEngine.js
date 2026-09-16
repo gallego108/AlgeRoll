@@ -4,6 +4,7 @@ import {
   hasQuadraticTerm,
   hasStructuralDoubleTerm,
   evaluatePolynomial,
+  hasBothVariables,
 } from './algebra.js';
 
 /**
@@ -31,12 +32,14 @@ export function validateChallenge(challenge, context) {
       return hasStructuralDoubleTerm(terms, diceById);
 
     case 'EVALUATE_AND_ANSWER': {
+      if (validator.requireBothVariables && !hasBothVariables(poly)) return false;
       const answer = Number(evaluationAnswer);
       if (String(evaluationAnswer ?? '').trim() === '' || !Number.isFinite(answer)) return false;
       return answer === evaluatePolynomial(poly, validator.x, validator.y);
     }
 
     case 'EVALUATION_PREDICATE': {
+      if (validator.requireBothVariables && !hasBothVariables(poly)) return false;
       const value = evaluatePolynomial(poly, validator.x, validator.y);
       switch (validator.operator) {
         case '<': return value < validator.value;
