@@ -852,6 +852,34 @@ body::before {
 .help-card-footer strong { font-family: var(--font-display); font-size: .78rem; letter-spacing: .4px; color: var(--alg-pink); text-shadow: 1px 1px white; }
 .help-card-footer small { font-size: .52rem; font-weight: 1000; letter-spacing: .6px; color: #78435a; }
 
+/* ---------- CARAS IMPRESAS DE LAS CARTAS ----------
+   Las imágenes ya incluyen el marco, los puntos y el título, por lo que se
+   usan como fondo completo de la carta (ajustado a su tamaño actual) y se
+   ocultan los elementos generados que duplicarían ese diseño. */
+.challenge-card.easy { background: url('assets/cards/challenge_easy.png') center / 100% 100% no-repeat, linear-gradient(155deg, #edf3ff, #cad9ef); }
+.challenge-card.intermediate { background: url('assets/cards/challenge_intermediate.png') center / 100% 100% no-repeat, linear-gradient(155deg, #fffbd4, #ffe629); }
+.challenge-card.hard { background: url('assets/cards/challenge_hard.png') center / 100% 100% no-repeat, linear-gradient(155deg, #ff736d, #e7131d); color: var(--card-ink); }
+.challenge-card { border-color: transparent; }
+.challenge-card::before { display: none; }
+.challenge-card .challenge-ribbon,
+.challenge-card .card-corner { display: none; }
+.challenge-card.hard .challenge-glyph { color: var(--alg-purple); border-color: rgba(55,35,93,.24); background: rgba(255,255,255,.55); }
+.challenge-card.hard .challenge-card-footer { color: white; }
+.challenge-card-body { padding: 56px 34px 46px; }
+
+.help-card.visual-card {
+  grid-template-rows: auto 1fr auto;
+  border-color: transparent;
+  background: url('assets/cards/help_card.png') center / 100% 100% no-repeat, linear-gradient(160deg, #ffd8d3, #ffb9b2 62%, #ff9f9a);
+}
+.help-card.visual-card::before,
+.help-card.visual-card::after,
+.help-card.visual-card .help-card-art { display: none; }
+.help-card-header { grid-template-columns: 1fr auto; padding: 46px 14px 6px; }
+.help-card-text { padding: 4px 18px 8px; }
+.help-card-footer { background: transparent; border-top: none; justify-content: flex-end; padding: 6px 14px 12px; }
+.help-card-footer strong { display: none; }
+
 /* ---------- CAJAS DE TÉRMINOS ---------- */
 .term-box {
   position: relative;

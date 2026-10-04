@@ -588,6 +588,7 @@ La aplicación debe funcionar sin APIs de generación de imágenes.
 - branding;
 - decoraciones;
 - algeplano;
+- caras impresas de cartas de reto y ayuda (fondo estático; el texto se renderiza por código);
 - elementos gráficos originales;
 - referencias visuales.
 

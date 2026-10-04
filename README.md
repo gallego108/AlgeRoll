@@ -1,8 +1,8 @@
-# AlgeRoll · Versión definitiva 1.3.3
+# AlgeRoll · Versión definitiva 1.3.4
 
 Versión local jugable de **AlgeRoll · Desafíos algebraicos**, construida a partir de las instrucciones, cartas y decisiones funcionales documentadas en `AlgeRoll_Especificacion_Funcional_Tecnica.md`.
 
-Esta edición incorpora el acabado visual definitivo del prototipo: **dados cúbicos 3D con seis caras reales, lanzamiento con giro tridimensional, cartas de reto y ayuda dibujadas como cartas físicas, animaciones de entrada, selección, caída de fichas y celebraciones visuales**. Todo funciona de forma local y sin generación de imágenes por IA durante la partida.
+Esta edición incorpora el acabado visual definitivo del prototipo: **dados cúbicos 3D con seis caras reales, lanzamiento con giro tridimensional, cartas de reto y ayuda con su cara impresa original como fondo, animaciones de entrada, selección, caída de fichas y celebraciones visuales**. Todo funciona de forma local y sin generación de imágenes por IA durante la partida.
 
 ## Inicio rápido en Windows
 
@@ -41,6 +41,13 @@ npm test
 La entrega se valida con el runner integrado de Node.js y no descarga dependencias.
 
 ## Novedades visuales
+
+### v1.3.4 · Caras impresas de las cartas
+
+- **Cartas de reto con su cara impresa**: cada dificultad usa su arte original como fondo completo de la carta — `assets/cards/challenge_easy.png`, `challenge_intermediate.png` y `challenge_hard.png` — ajustado al tamaño que la carta ya tiene en la mesa. El marco, el badge `+1/+2/+3`, el título `RETO` y las decoraciones provienen de la imagen; el texto del reto y la representación con algeplano se siguen renderizando por código y permanecen legibles.
+- **Cartas de ayuda con su cara impresa**: toda la mano usa `assets/cards/help_card.png` como fondo, conservando superpuestos y legibles la categoría, el código y el texto de cada carta.
+- Se ocultan los elementos generados que duplicaban el diseño impreso (cinta de dificultad, esquinas de puntuación e iconografía decorativa) para evitar solapamientos.
+- Los originales de estas caras permanecen en `docs/fuentes/` y las copias optimizadas para la web viven en `assets/cards/`.
 
 ### v1.3.3 · Mesa de juego y aviso de turno
 
@@ -134,6 +141,7 @@ AlgeRoll_Definitivo/
 │       └── helpCards.js
 ├── assets/
 │   ├── brand/
+│   ├── cards/            # caras impresas de cartas de reto y ayuda
 │   ├── algebra_tiles/
 │   └── references/
 ├── tests/

@@ -1120,8 +1120,7 @@ function renderHelpHandBody() {
         const selected = state.interaction?.card.instanceId === card.instanceId;
         const meta = helpCategoryMeta(card.category);
         return `<button class="help-card visual-card ${selected ? 'selected' : ''} ${!applicable ? 'disabled-card' : ''}" data-help-id="${card.instanceId}" ${(!applicable || (state.interaction && !selected)) ? 'disabled' : ''} style="--card-index:${index}">
-          <span class="help-card-header"><b>${meta.icon}</b><span>${meta.label}</span><em>${card.id}</em></span>
-          <span class="help-card-art"><span class="help-art-symbol">${meta.icon}</span><span class="help-art-ring"></span></span>
+          <span class="help-card-header"><span>${meta.label}</span><em>${card.id}</em></span>
           <span class="help-card-text">${escapeHtml(card.text)}</span>
           <span class="help-card-footer"><strong>ALGEROLL</strong><small>${applicable ? 'USAR CARTA' : 'NO APLICABLE'}</small></span>
         </button>`;

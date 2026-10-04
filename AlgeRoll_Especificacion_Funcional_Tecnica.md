@@ -1,6 +1,6 @@
 # AlgeRoll - Especificación funcional, técnica y banco de imágenes
 
-**Versión de especificación:** 1.3.3 - MVP navegable local  
+**Versión de especificación:** 1.3.4 - MVP navegable local  
 **Destino:** implementación asistida por OpenCode, Codex u otro agente de desarrollo en un equipo local  
 **Tipo de producto:** juego de mesa virtual educativo, ejecutado en navegador, sin backend en el MVP  
 **Idioma de interfaz:** español  
@@ -57,6 +57,21 @@ Reglas de construcción obligatorias del cubo:
 - el `hover` no debe volver a girar el dado después del lanzamiento: únicamente puede elevarlo o resaltarlo.
 
 La animación de lanzamiento debe ser suficientemente pausada para apreciar el giro 3D, con una duración aproximada de 3,5 a 3,9 segundos incluyendo pequeños desfases entre dados, y debe terminar **sin giro residual** sobre la cara obtenida.
+
+---
+
+### 0.3 Nota de implementación visual de cartas (v1.3.4)
+
+**[ACORDADO]** Las cartas de reto y de ayuda usan como fondo su **cara impresa original** ajustada al tamaño que la carta ya ocupa en la mesa. El fondo aporta el marco, el color de dificultad, el badge de puntos (`+1/+2/+3`), el título (`RETO` / `CARTA DE AYUDA`) y las decoraciones; **el texto del reto, la representación con algeplano y el texto de la carta de ayuda se siguen renderizando por código** (HTML/CSS) y deben permanecer legibles por encima del fondo.
+
+Reglas de construcción:
+
+- cada dificultad de reto usa su asset: `assets/cards/challenge_easy.png`, `assets/cards/challenge_intermediate.png` y `assets/cards/challenge_hard.png`;
+- todas las cartas de ayuda comparten `assets/cards/help_card.png`;
+- el fondo se estira al tamaño de la carta (`background-size: 100% 100%`), priorizando conservar el tamaño de la carta frente a la proporción exacta del arte;
+- los elementos generados que duplican el diseño impreso (cinta de dificultad, esquinas de puntuación, iconografía decorativa, marcos internos) se ocultan;
+- el texto dinámico debe mantener contraste suficiente sobre la zona clara de la cara impresa;
+- se sigue cumpliendo la prohibición de generar imágenes en runtime: estas caras son assets raster estáticos incluidos en el proyecto.
 
 ---
 
@@ -1931,7 +1946,20 @@ Reto D05:
 
 ![xy + x² + 2](assets/algebra_tiles/challenge_xy_plus_x2_plus_2.png)
 
-### 37.3 Capturas de referencia completas
+### 37.3 Caras impresas de cartas (v1.3.4)
+
+Copias web de los diseños originales de carta entregados en `docs/fuentes/`. Se usan como fondo completo de la carta, ajustado a su tamaño en la mesa; el texto dinámico se superpone por código.
+
+| Archivo | Contenido | Uso |
+|---|---|---|
+| `assets/cards/challenge_easy.png` | cara de reto fácil (`+1`, verde) | fondo de cartas de reto fáciles |
+| `assets/cards/challenge_intermediate.png` | cara de reto intermedio (`+2`, violeta) | fondo de cartas de reto intermedias |
+| `assets/cards/challenge_hard.png` | cara de reto difícil (`+3`, rojo) | fondo de cartas de reto difíciles |
+| `assets/cards/help_card.png` | cara de carta de ayuda (amarilla) | fondo de todas las cartas de ayuda |
+
+Los originales sin recortes permanecen en `docs/fuentes/` (`CartaRetoFácil_h.png`, `CartaRetoIntermedio_h.png`, `CartaRetoDificil_h.png`, `CartaAyuda.png`) y no se cargan en producción.
+
+### 37.4 Capturas de referencia completas
 
 Estas imágenes no deberían cargarse en producción; sirven para que el desarrollador compare estética, distribución de colores y contenido con el material original.
 
@@ -1942,18 +1970,19 @@ Estas imágenes no deberían cargarse en producción; sirven para que el desarro
 - `assets/references/cartas_page_3.png`
 - `assets/references/cartas_page_4.png`
 
-### 37.4 Política de uso del banco de imágenes
+### 37.5 Política de uso del banco de imágenes
 
 Clasificar cada recurso antes de usarlo:
 
 | Categoría | Ejemplos | ¿Se carga en producción? | Regla |
 |---|---|---:|---|
 | Identidad/decoración estática | papeles rasgados, peones, ilustraciones de dados | Sí, opcionalmente | Usar como ambientación; nunca como sustituto de un control interactivo |
+| Cara impresa de carta | caras de reto y ayuda en `assets/cards/` | Sí | Fondo estático ajustado al tamaño de la carta; el texto y el algeplano se renderizan por código y no se incrustan en la imagen |
 | Contenido semántico de reto | imágenes de algeplano | Sí | Mostrar el asset original dentro de la carta y validar contra su objetivo algebraico interno |
 | Referencia de desarrollo | páginas completas renderizadas | No | Sirven para comparar estética y contenido; excluir del bundle final si no son necesarias |
 | UI interactiva | dado jugable, carta textual, caja de término, token de ayuda | No aplica | Debe renderizarse con código HTML/CSS/SVG |
 
-### 37.5 Prohibición de generación de imágenes en runtime
+### 37.6 Prohibición de generación de imágenes en runtime
 
 El MVP **no implementará un generador automático de imágenes**. En concreto:
 
@@ -1966,7 +1995,7 @@ El MVP **no implementará un generador automático de imágenes**. En concreto:
 
 Las variaciones visuales necesarias se resuelven mediante datos y componentes. Ejemplo: una carta de ayuda es un objeto de datos (`text`, `effect`, `copies`) y el componente `HelpCard` la dibuja con CSS; una cara de dado es un valor `Face` y `DiceFace` muestra el símbolo correspondiente.
 
-### 37.6 Qué significa “generado por la app” en esta especificación
+### 37.7 Qué significa “generado por la app” en esta especificación
 
 Cuando se indique que un elemento visual es “generado por la app”, significa **renderizado determinísticamente por el frontend a partir del estado del juego**, no “generado por inteligencia artificial”. Ejemplos:
 
@@ -1986,12 +2015,14 @@ Para mantener nitidez y accesibilidad, crear con HTML/CSS/SVG en código:
 - fichas virtuales generadas por cartas;
 - signos `+` y `×`;
 - cajas de términos;
-- cartas de reto de solo texto;
-- cartas de ayuda de solo texto;
+- el texto de las cartas de reto de solo texto;
+- el texto de las cartas de ayuda;
 - badges de puntuación;
 - candados de dado bloqueado.
 
 Los assets raster de dados incluidos son decoración/referencia, no deben sustituir al componente interactivo.
+
+El **texto** de las cartas nunca se incrusta en una imagen: a partir de v1.3.4 la cara impresa (`assets/cards/`) se usa únicamente como fondo estático, sobre el que se superponen por código el texto del reto, el algeplano y el texto de la ayuda.
 
 ### 38.1 Implementación recomendada por componente
 
@@ -1999,8 +2030,8 @@ Los assets raster de dados incluidos son decoración/referencia, no deben sustit
 |---|---|---|
 | Dado jugable | `<button>`/`div` accesible + CSS 3D/2D; símbolo en texto/SVG | Ninguno obligatorio |
 | Cara `x²`, `y²` | texto con `<sup>` o SVG | Ninguno |
-| Carta de ayuda | componente React + CSS + datos | decoración opcional de fondo, sin incrustar el texto en imagen |
-| Carta de reto textual | componente React + CSS + datos | ninguno obligatorio |
+| Carta de ayuda | componente React + CSS + datos | fondo estático `assets/cards/help_card.png`; texto, categoría y código por CSS |
+| Carta de reto textual | componente React + CSS + datos | fondo estático según dificultad (`assets/cards/challenge_*`); texto y badges por CSS |
 | Carta de reto con algeplano | componente React + asset de `algebra_tiles/` | Sí, asset original correspondiente |
 | Caja de término | componente droppable + CSS | Ninguno |
 | Ficha añadida por ayuda | componente React + CSS/SVG | Ninguno |
@@ -2048,16 +2079,18 @@ Debe diferenciarse del dado:
 
 ### Carta de reto
 
-- color por dificultad;
-- badge superior `1`, `2` o `3 pts`;
-- texto centrado;
+- cara impresa por dificultad de fondo (`assets/cards/challenge_easy|intermediate|hard.png`, v1.3.4), ajustada al tamaño de la carta;
+- color por dificultad (incluido en la cara impresa);
+- badge superior `1`, `2` o `3 pts` (incluido en la cara impresa);
+- texto centrado y legible sobre la zona clara;
 - las imágenes algeplano deben usar `object-fit: contain` y no deformarse;
 - selección con elevación y outline, no solo cambio de color.
 
 ### Carta de ayuda
 
-- familia coral/rosa suave;
-- texto completo;
+- cara impresa común de fondo (`assets/cards/help_card.png`, v1.3.4), ajustada al tamaño de la carta;
+- familia coral/rosa/amarilla suave;
+- texto completo, categoría y código superpuestos por código;
 - efecto hover/selected;
 - si no es aplicable, no ocultarla: mostrarla atenuada con tooltip/motivo breve.
 
