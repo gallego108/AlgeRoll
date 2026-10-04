@@ -8,7 +8,46 @@ Esta edición incorpora el acabado visual definitivo del prototipo: **dados cúb
 
 Este juego está inspirado en el Trabajo Fin de Máster **«Secuencia didáctica basada en registro de representación y juegos para la introducción del álgebra en la educación secundaria»**, escrito por **Viviana Bermudez Herrera**, estudiante del Máster Universitario en Investigación e Innovación Educativa de la Universidad de Sevilla.
 
-## Inicio rápido en Windows
+## Ejecutable de Windows (recomendado)
+
+La forma más sencilla de jugar: un único archivo ejecutable que **ya incluye el juego completo y todo lo necesario para funcionar**. El jugador no instala Node.js, no abre el navegador y no descarga nada.
+
+1. Descarga **`AlgeRoll-1.3.4-portable.exe`**.
+2. Haz doble clic para jugar. Se abre una ventana propia de AlgeRoll.
+
+El ejecutable funciona sin conexión a Internet. No requiere instalación ni permisos de administrador.
+
+### Cómo generar el ejecutable
+
+En la máquina de desarrollo (requiere Internet **solo durante la compilación**):
+
+```bash
+npm install
+npm run dist
+```
+
+El resultado queda en `dist/AlgeRoll-1.3.4-portable.exe`. Para probar el juego en modo escritorio sin compilar:
+
+```bash
+npm run electron
+```
+
+También se puede generar un instalador clásico con acceso directo en el menú Inicio:
+
+```bash
+npm run dist:installer
+```
+
+### Si la compilación falla al preparar `winCodeSign`
+
+En equipos donde la cuenta no puede crear enlaces simbólicos, `electron-builder` puede fallar al extraer el paquete `winCodeSign` (contiene archivos de macOS irrelevantes en Windows). Soluciones:
+
+- Activa el **Modo para desarrolladores** de Windows (Configuración → Sistema → Para desarrolladores), o
+- Ejecuta la compilación desde una terminal **abierta como administrador**.
+
+El juego ya compilado no se ve afectado: solo incide en el proceso de build en la máquina de desarrollo.
+
+## Inicio rápido en Windows (alternativa con navegador)
 
 No es necesario ejecutar `npm install`: el juego no utiliza dependencias externas en tiempo de ejecución.
 
@@ -128,12 +167,20 @@ La aplicación utiliza **JavaScript modular, HTML y CSS**, sin frameworks ni dep
 
 Esto permite que cada dado pueda cambiar de cara, girar, seleccionarse, arrastrarse, bloquearse y relanzarse dinámicamente sin necesitar recursos gráficos adicionales.
 
+El ejecutable de escritorio se construye con **Electron** y **electron-builder**. `electron/main.cjs` reutiliza `server.mjs` en un proceso interno ligado a `127.0.0.1` sobre un puerto libre, y muestra el juego en una ventana nativa. El empaquetado es **portable**: un único `.exe` sin instalación.
+
 ```text
 AlgeRoll_Definitivo/
 ├── AlgeRoll.bat
-├── server.mjs
+├── server.mjs              # servidor estático (CLI y uso interno de Electron)
 ├── index.html
 ├── styles.css
+├── electron/
+│   └── main.cjs            # proceso principal de Electron (ventana nativa)
+├── scripts/
+│   └── make-icon.mjs       # genera build/icon.ico sin dependencias
+├── build/
+│   └── icon.ico            # icono usado por Electron y electron-builder
 ├── src/
 │   ├── app.js
 │   ├── algebra.js
@@ -147,11 +194,11 @@ AlgeRoll_Definitivo/
 │   ├── brand/
 │   ├── cards/            # caras impresas de cartas de reto y ayuda
 │   ├── algebra_tiles/
-│   └── references/
+│   └── references/       # solo para desarrollo; no se incluye en el ejecutable
 ├── tests/
 ├── AlgeRoll_Especificacion_Funcional_Tecnica.md
 └── docs/
-    └── fuentes/
+    └── fuentes/          # solo para desarrollo; no se incluye en el ejecutable
 ```
 
 ## Reglas importantes implementadas
