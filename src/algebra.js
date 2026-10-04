@@ -187,6 +187,37 @@ export function hasStructuralDoubleTerm(terms, diceById) {
   return false;
 }
 
+export function hasStructuralTripleTerm(terms, diceById) {
+  const values = terms.map((t) => simplifyTerm(t, diceById)).filter(Boolean);
+  for (let i = 0; i < values.length; i += 1) {
+    for (let j = i + 1; j < values.length; j += 1) {
+      const a = values[i];
+      const b = values[j];
+      if (!sameLiteralPart(a, b)) continue;
+      if (a.coef === b.coef * 3 || b.coef === a.coef * 3) return true;
+    }
+  }
+  return false;
+}
+
+export function isTwoTermsConstant3(poly) {
+  return countTerms(poly) === 2 && poly.get('0,0') === 3;
+}
+
+export function hasSingleSquareTerm(poly) {
+  const terms = polynomialTerms(poly);
+  if (terms.length !== 1) return false;
+  const [m] = terms;
+  return m.coef === 1 && ((m.xPow === 2 && m.yPow === 0) || (m.xPow === 0 && m.yPow === 2));
+}
+
+export function isSingleTermXYWithNumber(poly) {
+  const terms = polynomialTerms(poly);
+  if (terms.length !== 1) return false;
+  const [m] = terms;
+  return m.xPow === 1 && m.yPow === 1 && m.coef > 1;
+}
+
 export function termHasExactFaceFactor(term, face, diceById) {
   return term.factors.some((factor) => {
     if (factor.kind === 'die') {

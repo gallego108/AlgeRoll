@@ -3,6 +3,10 @@ import {
   countTerms,
   hasQuadraticTerm,
   hasStructuralDoubleTerm,
+  hasStructuralTripleTerm,
+  isTwoTermsConstant3,
+  hasSingleSquareTerm,
+  isSingleTermXYWithNumber,
   evaluatePolynomial,
   hasBothVariables,
 } from './algebra.js';
@@ -22,6 +26,9 @@ export function validateChallenge(challenge, context) {
     case 'ENDS_CONSTANT_3':
       return poly.get('0,0') === 3 && [...poly.keys()].some((key) => key !== '0,0');
 
+    case 'TWO_TERMS_CONSTANT_3':
+      return isTwoTermsConstant3(poly);
+
     case 'HAS_QUADRATIC_TERM':
       return hasQuadraticTerm(poly);
 
@@ -30,6 +37,15 @@ export function validateChallenge(challenge, context) {
 
     case 'STRUCTURAL_DOUBLE_TERM':
       return hasStructuralDoubleTerm(terms, diceById);
+
+    case 'STRUCTURAL_TRIPLE_TERM':
+      return hasStructuralTripleTerm(terms, diceById);
+
+    case 'SINGLE_SQUARE_TERM':
+      return hasSingleSquareTerm(poly);
+
+    case 'SINGLE_TERM_XY_WITH_NUMBER':
+      return isSingleTermXYWithNumber(poly);
 
     case 'EVALUATE_AND_ANSWER': {
       if (validator.requireBothVariables && !hasBothVariables(poly)) return false;

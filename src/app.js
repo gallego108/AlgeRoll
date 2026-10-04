@@ -458,7 +458,7 @@ function toggleInteractionDie(dieId) {
   if (!interaction) return;
   const die = state.dice.find((d) => d.id === dieId);
   if (!die || die.locked) return;
-  const effects = ['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','CHOOSE_DICE_FACES'];
+  const effects = ['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','CHOOSE_DICE_FACES','SET_DIE_FACE'];
   if (!effects.includes(interaction.card.effect)) return;
   const exists = interaction.selectedDice.includes(dieId);
   const max = interaction.card.max || interaction.card.count || 1;
@@ -596,6 +596,16 @@ async function confirmHelp() {
     die.face = OPPOSITE_FACE[die.face];
     consumeHelp(card);
     setMessage('Carta aplicada: cara opuesta.', 'success');
+    render();
+    return;
+  }
+
+  if (card.effect === 'SET_DIE_FACE') {
+    if (interaction.selectedDice.length !== 1) return fail('Selecciona exactamente un dado.');
+    const die = state.dice.find((d) => d.id === interaction.selectedDice[0]);
+    die.face = card.face;
+    consumeHelp(card);
+    setMessage(`Carta aplicada: dado cambiado a ${FACE_LABELS[card.face]}.`, 'success');
     render();
     return;
   }
@@ -794,7 +804,7 @@ function restartToSetup() {
 function helpApplicable(card) {
   if (!state.hasRolled) return false;
   const unlockedDice = state.dice.filter((d) => !d.locked).length;
-  if (['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE'].includes(card.effect)) return unlockedDice >= 1;
+  if (['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','SET_DIE_FACE'].includes(card.effect)) return unlockedDice >= 1;
   if (card.effect === 'CHOOSE_DICE_FACES') return unlockedDice >= 2;
   if (['MULTIPLY_TERM','TERM_TO_ONE'].includes(card.effect)) return state.terms.some((t) => t.factors.length);
   if (card.effect === 'COPY_TERM') return state.terms.some((t) => t.factors.length) && state.terms.some((t) => !t.factors.length);
@@ -1000,7 +1010,7 @@ function renderDie(die, context = 'pool') {
 }
 
 function diceSelectionMode() {
-  return !!(state.interaction && ['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','CHOOSE_DICE_FACES'].includes(state.interaction.card.effect));
+  return !!(state.interaction && ['REROLL_DICE','OPPOSITE_DIE','CHOOSE_DIE_FACE','CHOOSE_DICE_FACES','SET_DIE_FACE'].includes(state.interaction.card.effect));
 }
 
 function renderDiceBody() {
@@ -1128,6 +1138,7 @@ function helpInstruction(interaction) {
   switch (card.effect) {
     case 'REROLL_DICE': return `Selecciona entre ${card.min} y ${card.max} dados no bloqueados.`;
     case 'OPPOSITE_DIE': return 'Selecciona un dado. Se cambiará automáticamente a su cara opuesta.';
+    case 'SET_DIE_FACE': return `Selecciona un dado. Se cambiará automáticamente a la cara ${FACE_LABELS[card.face]}.`;
     case 'CHOOSE_DIE_FACE': return 'Selecciona un dado y luego elige la nueva cara.';
     case 'CHOOSE_DICE_FACES': return 'Selecciona exactamente dos dados y elige una cara para cada uno.';
     case 'MULTIPLY_TERM': return `Selecciona una caja no vacía. Su valor se multiplicará por ${card.by}.`;

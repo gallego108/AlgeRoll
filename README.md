@@ -95,7 +95,7 @@ La entrega se valida con el runner integrado de Node.js y no descarga dependenci
 - Alternativa accesible por clic: selecciona un dado/factor y luego una caja.
 - Multiplicación dentro de cada caja y suma entre cajas.
 - Simplificación algebraica automática.
-- 20 retos activos ya definidos; **no se incluye el reto de 5 términos**.
+- 30 retos activos ya definidos (12 fáciles, 12 intermedios, 6 difíciles); **no se incluye el reto de 5 términos**.
 - 4 retos visibles simultáneamente.
 - Validación automática de retos.
 - Retos de evaluación numérica con entrada de respuesta cuando corresponde.

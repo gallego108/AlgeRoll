@@ -564,7 +564,7 @@ Gana quien tenga la puntuación mayor.
 
 **[ACORDADO]** El objetivo es obtener la máxima puntuación posible hasta que la partida termine.
 
-Con el mazo inicial de 20 retos activos y la puntuación 1/2/3 definida más adelante, el máximo teórico de puntos del mazo actual es **35 puntos**, aunque la partida puede terminar antes por agotamiento del mazo de ayuda.
+Con el mazo inicial de 30 retos activos (12 fáciles, 12 intermedios, 6 difíciles) y la puntuación 1/2/3 definida más adelante, el máximo teórico de puntos del mazo actual es **54 puntos**, aunque la partida puede terminar antes por agotamiento del mazo de ayuda.
 
 La pantalla final debe mostrar como mínimo:
 
@@ -629,11 +629,11 @@ La suma de cantidades de la siguiente tabla es 40 y reproduce el documento fuent
 | ID | Cant. | Texto | Categoría | Comportamiento digital |
 |---|---:|---|---|---|
 | H01 | 2 | Multiplica un término por 3 | Término | Seleccionar una caja no vacía. Multiplicar el valor del término por 3. Mostrar badge `×3`. |
-| H02 | 2 | Añade un término que sí tengas (Debe ser exactamente igual) | Expresión | Seleccionar un término existente y una caja vacía. Crear en la caja destino una copia virtual exactamente igual al término seleccionado. |
+| H02 | 2 | Añade un término | Expresión | Seleccionar un término existente y una caja vacía. Crear en la caja destino una copia virtual exactamente igual al término seleccionado. |
 | H03 | 2 | Cambia un dado por su cara opuesta | Dado | Seleccionar 1 dado físico no bloqueado y cambiar según `1<->2`, `x<->x²`, `y<->y²`. |
-| H04 | 2 | Añade un término que no tengas (ej. 4x²) | Expresión | Seleccionar una caja vacía. Mostrar las seis caras como opciones de ficha. Permitir componer libremente el nuevo término y confirmar solo si su valor simplificado no coincide con ningún término ya presente. |
+| H04 | 2 | Cambia un dado por un x² | Dado | Seleccionar 1 dado físico no bloqueado y fijar su cara a `x²`. |
 | H05 | 2 | Añade las X que quieras | Fichas/expresión | Seleccionar una caja. Mostrar botón/ficha `+x`; cada pulsación añade un factor virtual `x`. Sin límite lógico; al menos 1. |
-| H06 | 2 | Convierte un término en 1 | Término | Seleccionar caja no vacía. El valor efectivo de ese término pasa a `1`. Conservar la procedencia de los dados para que sigan considerándose usados si se gana el reto. |
+| H06 | 2 | Convierte un dado en 1 | Dado | Seleccionar 1 dado físico no bloqueado y fijar su cara a `1`. |
 | H07 | 2 | Añade las Y que quieras | Fichas/expresión | Igual que H05, usando factor virtual `y`. |
 | H08 | 2 | Cambia una Y por una X | Factor de expresión | Seleccionar exactamente un factor efectivo `y` dentro de la expresión y transformarlo a `x`. |
 | H09 | 3 | Vuelve a tirar hasta 3 dados | Dado | Seleccionar entre 1 y 3 dados físicos no bloqueados y relanzarlos con animación. |
@@ -644,10 +644,10 @@ La suma de cantidades de la siguiente tabla es 40 y reproduce el documento fuent
 | H14 | 2 | Modifica un dado para elegir la cara que quieras | Dado | Seleccionar 1 dado no bloqueado; mostrar `1,2,x,y,x²,y²`; elegir una nueva cara. |
 | H15 | 2 | Modifica 2 dados como quieras | Dado | Seleccionar exactamente 2 dados no bloqueados; elegir la cara de cada uno. |
 | H16 | 2 | Duplica un término | Término | Seleccionar caja no vacía y duplicar su valor, equivalente a multiplicarlo por 2 dentro de la misma caja. Mostrar badge `×2`. |
-| H17 | 2 | Cambia una Y² por una X² | Factor de expresión | Seleccionar un factor efectivo `y²` y transformarlo en `x²`. |
-| H18 | 2 | Cambia una X² por una Y² | Factor de expresión | Seleccionar un factor efectivo `x²` y transformarlo en `y²`. |
-| H19 | 1 | Añade hasta 3x² | Fichas/expresión | Seleccionar caja; añadir 1, 2 o 3 factores virtuales `x²`. |
-| H20 | 1 | Añade hasta 3y² | Fichas/expresión | Seleccionar caja; añadir 1, 2 o 3 factores virtuales `y²`. |
+| H17 | 2 | Cambia un dado por X² | Dado | Seleccionar 1 dado físico no bloqueado y fijar su cara a `x²`. |
+| H18 | 2 | Cambia un dado por Y² | Dado | Seleccionar 1 dado físico no bloqueado y fijar su cara a `y²`. |
+| H19 | 1 | Añade hasta 3 veces x² | Fichas/expresión | Seleccionar caja; añadir 1, 2 o 3 factores virtuales `x²`. |
+| H20 | 1 | Añade hasta 3 veces y² | Fichas/expresión | Seleccionar caja; añadir 1, 2 o 3 factores virtuales `y²`. |
 
 ### 12.3 Fichas virtuales generadas por ayudas
 
@@ -663,21 +663,17 @@ Reglas:
 - si hay muchas fichas idénticas, la UI puede agruparlas visualmente como `x × 12`, pero el modelo conserva la cantidad real;
 - las cartas H05/H07 no tienen máximo de regla; no introducir un límite matemático artificial.
 
-### 12.4 “Añade un término que no tengas”
+### 12.4 “Cambia un dado por X² / Y² / 1”
 
-**[ACORDADO]** Interacción específica:
+**[ACORDADO]** Interacción específica de H04, H06, H17 y H18:
 
-1. usar H04;
-2. iluminar las cajas de término disponibles;
-3. seleccionar una caja vacía;
-4. mostrar debajo las seis opciones `1`, `2`, `x`, `y`, `x²`, `y²`;
-5. el jugador pulsa las opciones que quiera para construir el término;
-6. se muestra la simplificación en tiempo real;
-7. `Confirmar término` solo se habilita si:
-   - contiene al menos un factor;
-   - el término simplificado no es exactamente igual a ninguno de los términos ya presentes.
+1. pulsar la carta (entra en modo selección de dado);
+2. iluminar los dados físicos no bloqueados;
+3. seleccionar exactamente un dado;
+4. pulsar `Confirmar`: la cara del dado pasa automáticamente al valor fijado por la carta (`x²`, `y²` o `1`);
+5. la carta pasa a la pila de descarte.
 
-Ejemplo: seleccionar `2`, `2`, `x²` produce `4x²`.
+A diferencia de H14/H15, la cara destino no se elige: viene fijada por el texto de la carta.
 
 ### 12.5 Ayudas de dado vs. ayudas de expresión
 
@@ -703,64 +699,70 @@ Esto evita que una carta como “Convierte un término en 1” permita reciclar 
 - Los retos ganados se retiran de la mesa y se guardan en la colección del jugador.
 - Los huecos se reponen al finalizar el turno.
 
-## 13.2 Retos fáciles activos - 10 cartas
+## 13.2 Retos fáciles activos - 12 cartas
 
 Puntuación: **1 punto** cada una.
 
-| ID | Posición fuente | Contenido visible | Tipo de validación | Regla exacta |
-|---|---|---|---|---|
-| E01 | Fila 1, col. 1 | Expresión con dos términos | `TERM_COUNT` | La expresión global simplificada tiene exactamente 2 monomios no nulos. |
-| E02 | Fila 1, col. 2 | Expresión que termine en +3 | `ENDS_CONSTANT_3` | La forma canónica tiene término constante `+3` y al menos un término no constante. El render canónico coloca la constante al final. |
-| E03 | Fila 1, col. 3 | Expresión con tres términos | `TERM_COUNT` | Exactamente 3 monomios tras simplificar. |
-| E04 | Fila 2, col. 1 | Expresión con un término cuadrático | `HAS_QUADRATIC_TERM` | Existe al menos un monomio de grado total 2 (`x²`, `xy`, `y²`, con cualquier coeficiente positivo). |
-| E05 | Fila 2, col. 2 | `x² + y²` | `EXACT_POLYNOMIAL` | Igualdad algebraica exacta con `x² + y²`. |
-| E06 | Fila 2, col. 3 | `x + x² + 1` | `EXACT_POLYNOMIAL` | Igualdad algebraica exacta; canónicamente `x² + x + 1`. |
-| E07 | Fila 3, col. 1 | `y + y² + 1` | `EXACT_POLYNOMIAL` | Igualdad exacta; canónicamente `y² + y + 1`. |
-| E08 | Fila 3, col. 2 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `x² + 2`. Mantener imagen visible, objetivo interno `x² + 2`. |
-| E09 | Fila 4, col. 1 | `2x + 1` | `EXACT_POLYNOMIAL` | Igualdad exacta con `2x + 1`. |
-| E10 | Fila 4, col. 2 | `y + 2` | `EXACT_POLYNOMIAL` | Igualdad exacta con `y + 2`. |
+| ID | Contenido visible | Tipo de validación | Regla exacta |
+|---|---|---|---|
+| E01 | Expresión con dos términos | `TERM_COUNT` | La expresión global simplificada tiene exactamente 2 monomios no nulos. |
+| E02 | Expresión con dos términos que termine en +3 | `TWO_TERMS_CONSTANT_3` | Exactamente 2 monomios y el término constante es `+3`. |
+| E03 | Expresión con un término | `TERM_COUNT` | Exactamente 1 monomio no nulo. |
+| E04 | Expresión con un término cuadrático | `HAS_QUADRATIC_TERM` | Existe al menos un monomio de grado total 2 (`x²`, `xy`, `y²`, con cualquier coeficiente positivo). |
+| E05 | `x² + y²` | `EXACT_POLYNOMIAL` | Igualdad algebraica exacta con `x² + y²`. |
+| E06 | `x + x² + 1` | `EXACT_POLYNOMIAL` | Igualdad algebraica exacta; canónicamente `x² + x + 1`. |
+| E07 | `y² + y + 1` | `EXACT_POLYNOMIAL` | Igualdad exacta; canónicamente `y² + y + 1`. |
+| E08 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `x² + 2`. Objetivo interno `x² + 2`. |
+| E09 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `x² + xy`. Objetivo interno `x² + xy`. |
+| E10 | `2x + 1` | `EXACT_POLYNOMIAL` | Igualdad exacta con `2x + 1`. |
+| E11 | `y + 2` | `EXACT_POLYNOMIAL` | Igualdad exacta con `y + 2`. |
+| E12 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `3y + 2`. Objetivo interno `3y + 2`. |
 
-**Posiciones fáciles pendientes en el documento fuente:** fila 3 col. 3 y fila 4 col. 3. No crear contenido ficticio.
-
-## 13.3 Retos intermedios activos - 5 cartas
+## 13.3 Retos intermedios activos - 12 cartas
 
 Puntuación: **2 puntos** cada una.
 
-| ID | Posición fuente | Contenido visible | Tipo | Regla exacta |
-|---|---|---|---|---|
-| I01 | Fila 5, col. 1 | Expresión para el perímetro de un triángulo equilátero cuyo lado mide x | `EXACT_POLYNOMIAL` | Debe simplificar exactamente a `3x`. |
-| I02 | Fila 5, col. 2 | Expresión con 4 términos | `TERM_COUNT` | Exactamente 4 monomios no nulos después de simplificar. |
-| I03 | Fila 5, col. 3 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `y + 2y²`. Objetivo interno `2y² + y`. |
-| I04 | Fila 6, col. 1 | Expresión donde un término sea el doble de otro | `STRUCTURAL_DOUBLE_TERM` | Usar la excepción estructural descrita en §7.3. |
-| I05 | Fila 6, col. 2 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `2y + 3y²`. Objetivo interno `3y² + 2y`. |
+| ID | Contenido visible | Tipo | Regla exacta |
+|---|---|---|---|
+| I01 | Perímetro de un triángulo equilátero | `EXACT_POLYNOMIAL` | Debe simplificar exactamente a `3x`. |
+| I02 | Perímetro de un rectángulo de lados desconocidos | `EXACT_POLYNOMIAL` | Debe simplificar exactamente a `2x + 2y`. |
+| I03 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `y + 2y²`. Objetivo interno `2y² + y`. |
+| I04 | Expresión donde un término sea el doble de otro | `STRUCTURAL_DOUBLE_TERM` | Usar la excepción estructural descrita en §7.3. |
+| I05 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `2y + 3y²`. Objetivo interno `3y² + 2y`. |
+| I06 | Expresión donde un término sea el triple de otro | `STRUCTURAL_TRIPLE_TERM` | Dos términos con la misma parte literal y coeficientes en relación `×3`/`÷3`. |
+| I07 | `x² + 2x + 1` | `EXACT_POLYNOMIAL` | Igualdad exacta con `x² + 2x + 1`. |
+| I08 | El área de un cuadrado con lado desconocido | `SINGLE_SQUARE_TERM` | Un único término `x²` o `y²` con coeficiente 1. |
+| I09 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `x² + 2x + 1`. Objetivo interno `x² + 2x + 1`. |
+| I10 | Expresión de un solo término que use dos letras y un número | `SINGLE_TERM_XY_WITH_NUMBER` | Un único término con parte literal `xy` y coeficiente mayor que 1. |
+| I11 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `y² + 2x + 1`. Objetivo interno `y² + 2x + 1`. |
+| I12 | El área de un rectángulo cuya altura mide 3 y su base 2x | `EXACT_POLYNOMIAL` | Debe simplificar exactamente a `6x`. |
 
-**Posiciones intermedias pendientes:** fila 6 col. 3 y todas las casillas de las filas 7 y 8 del bloque amarillo. No inventar cartas.
-
-## 13.4 Retos difíciles activos - 5 cartas
+## 13.4 Retos difíciles activos - 6 cartas
 
 Puntuación: **3 puntos** cada una.
 
-| ID | Posición fuente | Contenido visible | Tipo | Regla exacta |
-|---|---|---|---|---|
-| D01 | Fila 9, col. 2 | `2x + 2y + 1` | `EXACT_POLYNOMIAL` | Igualdad exacta con `2x + 2y + 1`. |
-| D02 | Fila 9, col. 3 | Di el resultado de tu expresión si: `x=1` y `y=4` | `EVALUATE_AND_ANSWER` | El jugador construye una expresión que debe incluir al menos un término con `x` y otro con `y`; debe introducir el valor numérico de su expresión para `x=1, y=4`. El sistema calcula y compara la respuesta. |
-| D03 | Fila 10, col. 1 | Si `x=3`, `y=1`, el resultado es `< 15` | `EVALUATION_PREDICATE` | La expresión debe incluir al menos un término con `x` y otro con `y`; se evalúa en `(3,1)` y se comprueba valor `< 15`. |
-| D04 | Fila 10, col. 2 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `xy + x² + 2`. Objetivo interno `x² + xy + 2`. |
-| D05 | Fila 10, col. 3 | Si `x=1`, `y=3`, el resultado es `< 7` | `EVALUATION_PREDICATE` | La expresión debe incluir al menos un término con `x` y otro con `y`; se evalúa en `(1,3)` y se comprueba valor `< 7`. |
+| ID | Contenido visible | Tipo | Regla exacta |
+|---|---|---|---|
+| D01 | Expresión con 4 términos | `TERM_COUNT` | Exactamente 4 monomios no nulos después de simplificar. |
+| D02 | `2x² + 4` | `EXACT_POLYNOMIAL` | Igualdad exacta con `2x² + 4`. |
+| D03 | Construye una expresión y di el resultado si `x=1` e `y=4` | `EVALUATE_AND_ANSWER` | La expresión debe incluir al menos un término con `x` y otro con `y`; el jugador introduce el valor numérico para `x=1, y=4` y el sistema lo compara. |
+| D04 | Construye una expresión y di el resultado si `x=3` e `y=1` | `EVALUATE_AND_ANSWER` | La expresión debe incluir al menos un término con `x` y otro con `y`; el jugador introduce el valor numérico para `x=3, y=1` y el sistema lo compara. |
+| D05 | Imagen algeplano | `EXACT_POLYNOMIAL` | Imagen representa `xy + x² + 2`. Objetivo interno `x² + xy + 2`. |
+| D06 | Si `x=1`, `y=3`, el resultado es `< 7` | `EVALUATION_PREDICATE` | La expresión debe incluir al menos un término con `x` y otro con `y`; se evalúa en `(1,3)` y se comprueba valor `< 7`. |
 
-### 13.5 Reto eliminado
+### 13.5 Retos eliminados
 
 **[ACORDADO]** No incluir:
 
 - `Expresión con 5 términos`
+- `Expresión con tres términos` (sustituida en el documento nuevo por `Expresión con un término`).
+- `2x + 2y + 1` y el predicado `x=3, y=1 → < 15` (ya no aparecen en la fuente).
 
-Debe desaparecer del dataset activo, no mostrarse como carta deshabilitada.
+Deben desaparecer del dataset activo, no mostrarse como cartas deshabilitadas.
 
 ### 13.6 Retos pendientes
 
-El documento de cartas contiene **9 casillas vacías**. No hay información suficiente para completar su texto o lógica. Deben quedar fuera del mazo inicial.
-
-La arquitectura debe permitir añadirlos mediante datos.
+El documento v1 completa las **30 cartas** (12 fáciles + 12 intermedias + 6 difíciles) y ya no deja casillas vacías. La arquitectura sigue permitiendo añadir retos mediante datos.
 
 ---
 
@@ -1246,7 +1248,7 @@ export interface TermBoxState {
   id: 0 | 1 | 2 | 3;
   factors: TermFactor[];
   multiplier: number; // inicia en 1; H01/H16 pueden cambiarlo
-  overrideValue?: Monomial; // H06 puede establecer {1,0,0}
+  overrideValue?: Monomial; // reservado para overrides de término (sin carta activa en v1)
   sourceDieIdsReserved: Die['id'][];
   annotations: string[];
 }
@@ -1430,9 +1432,8 @@ export type HelpEffect =
   | { type: 'MULTIPLY_TERM'; factor: 3 }
   | { type: 'COPY_EXISTING_TERM' }
   | { type: 'OPPOSITE_DIE' }
-  | { type: 'CREATE_NEW_TERM' }
+  | { type: 'SET_DIE_FACE'; face: Face }
   | { type: 'ADD_UNLIMITED_FACTOR'; face: 'x' | 'y' }
-  | { type: 'TERM_TO_ONE' }
   | { type: 'TRANSFORM_FACTOR'; from: Face; to: Face }
   | { type: 'REROLL'; min: 1; max: 2 | 3 | 5 }
   | { type: 'ADD_CONSTANT'; value: 2 }
@@ -1543,11 +1544,11 @@ Pseudodataset directamente trasladable:
 ```ts
 export const HELP_DEFINITIONS = [
   { id: 'H01', copies: 2, text: 'Multiplica un término por 3', effect: { type: 'MULTIPLY_TERM', factor: 3 } },
-  { id: 'H02', copies: 2, text: 'Añade un término que sí tengas (Debe ser exactamente igual)', effect: { type: 'COPY_EXISTING_TERM' } },
+  { id: 'H02', copies: 2, text: 'Añade un término', effect: { type: 'COPY_EXISTING_TERM' } },
   { id: 'H03', copies: 2, text: 'Cambia un dado por su cara opuesta', effect: { type: 'OPPOSITE_DIE' } },
-  { id: 'H04', copies: 2, text: 'Añade un término que no tengas (ej. 4x²)', effect: { type: 'CREATE_NEW_TERM' } },
+  { id: 'H04', copies: 2, text: 'Cambia un dado por un x²', effect: { type: 'SET_DIE_FACE', face: 'x2' } },
   { id: 'H05', copies: 2, text: 'Añade las X que quieras', effect: { type: 'ADD_UNLIMITED_FACTOR', face: 'x' } },
-  { id: 'H06', copies: 2, text: 'Convierte un término en 1', effect: { type: 'TERM_TO_ONE' } },
+  { id: 'H06', copies: 2, text: 'Convierte un dado en 1', effect: { type: 'SET_DIE_FACE', face: '1' } },
   { id: 'H07', copies: 2, text: 'Añade las Y que quieras', effect: { type: 'ADD_UNLIMITED_FACTOR', face: 'y' } },
   { id: 'H08', copies: 2, text: 'Cambia una Y por una X', effect: { type: 'TRANSFORM_FACTOR', from: 'y', to: 'x' } },
   { id: 'H09', copies: 3, text: 'Vuelve a tirar hasta 3 dados', effect: { type: 'REROLL', min: 1, max: 3 } },
@@ -1558,10 +1559,10 @@ export const HELP_DEFINITIONS = [
   { id: 'H14', copies: 2, text: 'Modifica un dado para elegir la cara que quieras', effect: { type: 'CHOOSE_DIE_FACE', count: 1 } },
   { id: 'H15', copies: 2, text: 'Modifica 2 dados como quieras', effect: { type: 'CHOOSE_DIE_FACE', count: 2 } },
   { id: 'H16', copies: 2, text: 'Duplica un término', effect: { type: 'DOUBLE_TERM' } },
-  { id: 'H17', copies: 2, text: 'Cambia una Y² por una X²', effect: { type: 'TRANSFORM_FACTOR', from: 'y2', to: 'x2' } },
-  { id: 'H18', copies: 2, text: 'Cambia una X² por una Y²', effect: { type: 'TRANSFORM_FACTOR', from: 'x2', to: 'y2' } },
-  { id: 'H19', copies: 1, text: 'Añade hasta 3x²', effect: { type: 'ADD_LIMITED_FACTOR', face: 'x2', max: 3 } },
-  { id: 'H20', copies: 1, text: 'Añade hasta 3y²', effect: { type: 'ADD_LIMITED_FACTOR', face: 'y2', max: 3 } },
+  { id: 'H17', copies: 2, text: 'Cambia un dado por X²', effect: { type: 'SET_DIE_FACE', face: 'x2' } },
+  { id: 'H18', copies: 2, text: 'Cambia un dado por Y²', effect: { type: 'SET_DIE_FACE', face: 'y2' } },
+  { id: 'H19', copies: 1, text: 'Añade hasta 3 veces x²', effect: { type: 'ADD_LIMITED_FACTOR', face: 'x2', max: 3 } },
+  { id: 'H20', copies: 1, text: 'Añade hasta 3 veces y²', effect: { type: 'ADD_LIMITED_FACTOR', face: 'y2', max: 3 } },
 ] as const;
 ```
 
@@ -1688,7 +1689,7 @@ No bloquear el MVP si esto retrasa la versión jugable.
 7. H12 sobre `x` -> `x+2`.
 8. H01 sobre `2x` -> `6x`.
 9. H16 sobre `2x` -> `4x`.
-10. H06 produce término `1` y conserva IDs de dados usados.
+10. H06 cambia la cara del dado seleccionado a `1`.
 
 ### 33.2 Dados
 
@@ -1772,9 +1773,9 @@ H11 permite seleccionar 1 o 2, nunca 3.
 
 H03 transforma correctamente las tres parejas definidas.
 
-### AC-10 Crear término nuevo
+### AC-10 Cambiar cara de dado
 
-H04 muestra las seis opciones de cara, permite múltiples pulsaciones y rechaza confirmar un término ya presente.
+H04, H06, H17 y H18 exigen seleccionar un único dado y fijan su cara a `x²`, `1`, `x²` y `y²` respectivamente.
 
 ### AC-11 Cuatro cajas
 
@@ -1886,9 +1887,13 @@ Vista del desarrollo del dado especial:
 |---|---|---|
 | `assets/algebra_tiles/algeplano_legend.png` | leyenda de piezas `1,x,y,x²,xy,y²` | pantalla de ayuda/reglas |
 | `assets/algebra_tiles/challenge_x2_plus_2.png` | `x² + 2` | reto fácil E08 |
+| `assets/algebra_tiles/challenge_x2_plus_xy.png` | `x² + xy` | reto fácil E09 |
+| `assets/algebra_tiles/challenge_3y_plus_2.png` | `3y + 2` | reto fácil E12 |
 | `assets/algebra_tiles/challenge_y_plus_2y2.png` | `y + 2y²` | reto intermedio I03 |
 | `assets/algebra_tiles/challenge_2y_plus_3y2.png` | `2y + 3y²` | reto intermedio I05 |
-| `assets/algebra_tiles/challenge_xy_plus_x2_plus_2.png` | `xy + x² + 2` | reto difícil D04 |
+| `assets/algebra_tiles/challenge_x2_plus_2x_plus_1.png` | `x² + 2x + 1` | reto intermedio I09 |
+| `assets/algebra_tiles/challenge_y2_plus_2x_plus_1.png` | `y² + 2x + 1` | reto intermedio I11 |
+| `assets/algebra_tiles/challenge_xy_plus_x2_plus_2.png` | `xy + x² + 2` | reto difícil D05 |
 
 Leyenda:
 
@@ -1898,6 +1903,14 @@ Reto E08:
 
 ![x² + 2](assets/algebra_tiles/challenge_x2_plus_2.png)
 
+Reto E09:
+
+![x² + xy](assets/algebra_tiles/challenge_x2_plus_xy.png)
+
+Reto E12:
+
+![3y + 2](assets/algebra_tiles/challenge_3y_plus_2.png)
+
 Reto I03:
 
 ![y + 2y²](assets/algebra_tiles/challenge_y_plus_2y2.png)
@@ -1906,7 +1919,15 @@ Reto I05:
 
 ![2y + 3y²](assets/algebra_tiles/challenge_2y_plus_3y2.png)
 
-Reto D04:
+Reto I09:
+
+![x² + 2x + 1](assets/algebra_tiles/challenge_x2_plus_2x_plus_1.png)
+
+Reto I11:
+
+![y² + 2x + 1](assets/algebra_tiles/challenge_y2_plus_2x_plus_1.png)
+
+Reto D05:
 
 ![xy + x² + 2](assets/algebra_tiles/challenge_xy_plus_x2_plus_2.png)
 
@@ -2092,7 +2113,7 @@ Objetivo: juego completo aunque visualmente simple.
 ### Fase 5 - QA
 
 - pruebas de todas las ayudas;
-- pruebas de los 20 retos;
+- pruebas de los 30 retos;
 - pruebas con 1, 2 y 5 jugadores;
 - pruebas táctiles;
 - accesibilidad;
@@ -2119,9 +2140,8 @@ El prototipo está listo cuando:
 - [ ] no permite paréntesis, resta ni división;
 - [ ] implementa las 40 ayudas con sus cantidades;
 - [ ] las ayudas usadas se descartan;
-- [ ] implementa los 20 retos activos;
+- [ ] implementa los 30 retos activos;
 - [ ] no incluye “Expresión con 5 términos”;
-- [ ] no inventa los 9 retos fuente pendientes;
 - [ ] los retos algeplano muestran sus imágenes;
 - [ ] un fallo permite modificar y reintentar;
 - [ ] se pueden ganar máximo 4 retos por turno o hasta quedarse sin dados;
