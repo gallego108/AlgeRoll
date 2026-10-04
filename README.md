@@ -4,6 +4,10 @@ Versión local jugable de **AlgeRoll · Desafíos algebraicos**, construida a pa
 
 Esta edición incorpora el acabado visual definitivo del prototipo: **dados cúbicos 3D con seis caras reales, lanzamiento con giro tridimensional, cartas de reto y ayuda con su cara impresa original como fondo, animaciones de entrada, selección, caída de fichas y celebraciones visuales**. Todo funciona de forma local y sin generación de imágenes por IA durante la partida.
 
+## Origen
+
+Este juego está inspirado en el Trabajo Fin de Máster **«Secuencia didáctica basada en registro de representación y juegos para la introducción del álgebra en la educación secundaria»**, escrito por **Viviana Bermudez Herrera**, estudiante del Máster Universitario en Investigación e Innovación Educativa de la Universidad de Sevilla.
+
 ## Inicio rápido en Windows
 
 No es necesario ejecutar `npm install`: el juego no utiliza dependencias externas en tiempo de ejecución.
